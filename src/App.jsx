@@ -5,9 +5,9 @@ function App() {
 
   return (
     <>
-    <h1>Welcome to MarioMart</h1>
+    <h1 className="mario-header">Welcome to MarioMart</h1>
 
-    <h2>Main Body</h2>
+    <h2 className="mario-header">Main Body</h2>
     <p>test git push main branch</p>
 
     <footer className="mario-footer">
