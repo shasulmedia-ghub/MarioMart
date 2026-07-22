@@ -1,22 +1,22 @@
-
-import './App.css'
+import React from 'react';
+import './App.css';
+import Products from './component/Products.jsx';
 
 function App() {
- 
-
   return (
     <>
-    <h1>Welcome to MarioMart</h1>
+      <h1 className="mario-header">Welcome to MarioMart</h1>
 
-    <h2>Main Body</h2>
-    <p>test git push main branch</p>
-    <p>test yingtong-products branch...</p>
+      <h2 className='mario-header'>Main Content</h2>
 
-    <footer className="mario-footer">
-      <p className="mario-footer-credits">Copyright Capstone Project by Shahul, Johnny and YingTong</p>
-    </footer>
-      </>
-  )
+      <Products />
+
+      <footer className="mario-footer">
+        <p className="mario-footer-credits">Copyright Capstone Project by Shahul, Johnny and YingTong</p>
+      </footer>
+    </>
+  );
 }
 
-export default App
+export default App;
+
