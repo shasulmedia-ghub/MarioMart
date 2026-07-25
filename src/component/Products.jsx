@@ -270,31 +270,28 @@ function Products({ onAddToCart = () => {} }) {
 
             return (
               <div key={product.id} className="product-card">
-                {/* Category Badge */}
-                <div className="product-badge">
-                  {CATEGORIES[product.category_id]}
-                </div>
-
                 {/* Product Image Container */}
+                {/* Category Badge */}
+                  <div className="product-badge">
+                    {CATEGORIES[product.category_id]}
+                  </div>
                 <div className="product-image-container">
+                  
                   <div className="product-image-placeholder">
                     {product.image_url}
                   </div>
                 </div>
-
+                
                 {/* Product Info */}
                 <div style={{ textAlign: 'left', marginBottom: '12px' }}>
                   <div className="product-title">{product.name}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748B', fontFamily: 'var(--font-retro)', marginBottom: '8px' }}>
-                    SKU: {product.sku}
-                  </div>
                   <div style={{ marginBottom: '10px' }}>
                     <span className={`stock-badge ${stock.className}`}>
                       {stock.label}
                     </span>
                   </div>
-                  <div className="product-description">{product.description}</div>
                 </div>
+
 
                 {/* Product Footer (Price and Actions) */}
                 <div className="product-footer">
