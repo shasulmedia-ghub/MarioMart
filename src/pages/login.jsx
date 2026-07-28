@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-import Navbar from "../component/Navbar";
-import Footer from "../component/Footer";
+import Layout from "../component/Layout";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -59,7 +58,7 @@ function Login() {
 
         login(demoUser, fakeJWT);
 
-        navigate("/dashboard");
+        navigate("/pages/dashboard");
 
     };
 
@@ -67,7 +66,7 @@ function Login() {
 
         <>
 
-            <Navbar />
+            <Layout>
 
             <div
                 className="container py-5"
@@ -232,7 +231,7 @@ function Login() {
 
             </div>
 
-            <Footer />
+            </Layout>
 
         </>
 
