@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import Navbar from "../component/navbar";
-import Footer from "../component/footer";
+import Layout from "../component/Layout";
+import PageHeader from "../component/PageHeader";
 
 function Register() {
 
@@ -77,13 +77,16 @@ function Register() {
   const strength = passwordStrength();
 
   return (
-    <>
-      <Navbar />
+    <Layout>
+
+
 
       <div
         className="container py-5"
         style={{ minHeight: "80vh" }}
       >
+
+
 
         <div className="row justify-content-center">
 
@@ -93,9 +96,14 @@ function Register() {
 
               <div className="card-body p-5">
 
-                <h2 className="text-center fw-bold text-danger mb-4">
+                {/* <h2 className="text-center fw-bold text-danger mb-4">
                   Create Your MarioMart Account
-                </h2>
+                </h2> */}
+
+                <PageHeader
+                title="Create Account"
+                subtitle="Join MarioMart today." />
+                <br />
 
                 <form onSubmit={handleSubmit}>
 
@@ -328,8 +336,7 @@ function Register() {
 
       </div>
 
-      <Footer />
-    </>
+    </Layout>
   );
 }
 
