@@ -21,11 +21,8 @@ function Navbar() {
   } = useAuth();
 
   const handleLogout = () => {
-
     logout();
-
-    navigate("/");
-
+    navigate("/", { replace: true });
   };
 
   return (
@@ -78,7 +75,7 @@ function Navbar() {
 
                 <NavLink
                   className="nav-link"
-                  to="/dashboard"
+                  to="/pages/dashboard"
                 >
                   Dashboard
                 </NavLink>
@@ -129,7 +126,7 @@ function Navbar() {
 
                       <NavLink
                         className="dropdown-item"
-                        to="/dashboard"
+                        to="/pages/dashboard"
                       >
                         Dashboard
                       </NavLink>
