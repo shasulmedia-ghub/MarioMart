@@ -1,0 +1,101 @@
+id,category_id,product_name,description,created_at,updated_at
+1,101,Classic Crewneck Cotton T-Shirt,100% organic cotton breathable daily wear tee in a relaxed classic fit.,25/7/26 17:41,25/7/26 17:41
+2,101,Ringer Stripe Short Sleeve Tee,Retro-inspired ringer tee with contrast trim at the neck and sleeves.,25/7/26 17:41,25/7/26 17:41
+3,101,V-Neck Essential Tee,Soft-touch cotton blend tee with a flattering V-neckline for everyday layering.,25/7/26 17:41,25/7/26 17:41
+4,101,Graphic Print Oversized Tee,Drop-shoulder oversized tee featuring a bold front graphic print.,25/7/26 17:41,25/7/26 17:41
+5,102,Oxford Button-Down Shirt,"Crisp cotton oxford shirt with a button-down collar, ideal for smart-casual wear.",25/7/26 17:41,25/7/26 17:41
+6,102,Linen Blend Short Sleeve Shirt,"Breathable linen-cotton shirt with a relaxed fit, perfect for warm weather.",25/7/26 17:41,25/7/26 17:41
+7,102,Flannel Check Shirt,"Brushed flannel shirt in a classic check pattern with a soft, warm handfeel.",25/7/26 17:41,25/7/26 17:41
+8,102,Chambray Work Shirt,Durable chambray shirt with chest pockets and a slightly structured fit.,25/7/26 17:41,25/7/26 17:41
+9,103,Satin Wrap Blouse,Fluid satin blouse with a wrap front tie and elegant drape.,25/7/26 17:41,25/7/26 17:41
+10,103,Ruffle Sleeve Chiffon Top,Lightweight chiffon top with ruffled sleeves and a relaxed silhouette.,25/7/26 17:41,25/7/26 17:41
+11,103,Ribbed Knit Cami Top,"Fitted ribbed cami top with adjustable straps, great for layering.",25/7/26 17:41,25/7/26 17:41
+12,103,Tie-Front Peplum Top,Structured peplum top with a tie-front detail that cinches the waist.,25/7/26 17:41,25/7/26 17:41
+13,111,Cable Knit Crewneck Sweater,Chunky cable knit sweater in soft wool blend yarn for cold-weather warmth.,25/7/26 17:41,25/7/26 17:41
+14,111,Turtleneck Ribbed Sweater,Fitted ribbed turtleneck sweater with stretch for a sleek silhouette.,25/7/26 17:41,25/7/26 17:41
+15,111,Cotton Blend V-Neck Sweater,Lightweight V-neck sweater ideal for layering over shirts.,25/7/26 17:41,25/7/26 17:41
+16,121,Oversized Leather Biker Jacket,Premium faux leather jacket with zip details and quilted lining.,25/7/26 17:41,25/7/26 17:41
+17,121,Bomber Jacket with Ribbed Trim,"Classic bomber silhouette with ribbed cuffs, collar, and hem.",25/7/26 17:41,25/7/26 17:41
+18,121,Denim Trucker Jacket,Timeless denim jacket with button flap chest pockets and a boxy fit.,25/7/26 17:41,25/7/26 17:41
+19,121,Quilted Puffer Vest,Lightweight quilted vest with a stand collar for transitional layering.,25/7/26 17:41,25/7/26 17:41
+20,122,Wool Blend Overcoat,Tailored knee-length overcoat in a wool blend with a notched lapel.,25/7/26 17:41,25/7/26 17:41
+21,122,Longline Trench Coat,Water-resistant trench coat with a belted waist and classic double-breasted front.,25/7/26 17:41,25/7/26 17:41
+22,122,Faux Fur Lined Parka,Insulated parka with a faux fur trimmed hood for extra warmth.,25/7/26 17:41,25/7/26 17:41
+23,131,Heavyweight Fleece Pullover Hoodie,Cozy fleece hoodie with front kangaroo pocket and ribbed cuffs.,25/7/26 17:41,25/7/26 17:41
+24,131,Zip-Up Hoodie with Drawstring,Full-zip hoodie in soft fleece with an adjustable drawstring hood.,25/7/26 17:41,25/7/26 17:41
+25,131,Crewneck Fleece Sweatshirt,Classic crewneck sweatshirt in brushed fleece for everyday comfort.,25/7/26 17:41,25/7/26 17:41
+26,131,Oversized Graphic Hoodie,Relaxed-fit hoodie featuring a printed front graphic and dropped shoulders.,25/7/26 17:41,25/7/26 17:41
+27,141,High-Waist Compression Leggings,Squat-proof compression leggings with a wide waistband for support.,25/7/26 17:41,25/7/26 17:41
+28,141,Moisture-Wicking Training Tee,Lightweight performance tee with sweat-wicking fabric technology.,25/7/26 17:41,25/7/26 17:41
+29,141,Seamless Sports Bra,Medium-support seamless sports bra with removable padding.,25/7/26 17:41,25/7/26 17:41
+30,141,Zip-Front Track Jacket,Lightweight track jacket with mesh ventilation panels for training.,25/7/26 17:41,25/7/26 17:41
+31,141,Running Shorts with Liner,Quick-dry running shorts with a built-in brief liner and side pocket.,25/7/26 17:41,25/7/26 17:41
+32,151,Cotton Jersey Pajama Set,Soft jersey pajama set with a relaxed top and elastic waist pants.,25/7/26 17:41,25/7/26 17:41
+33,151,Fleece Lounge Robe,Plush fleece robe with a self-tie belt and deep front pockets.,25/7/26 17:41,25/7/26 17:41
+34,151,Satin Sleep Shorts Set,Silky satin cami and shorts sleep set with adjustable straps.,25/7/26 17:41,25/7/26 17:41
+35,161,Seamless Bikini Briefs 3-Pack,"Tagless seamless briefs in breathable stretch fabric, pack of three.",25/7/26 17:41,25/7/26 17:41
+36,161,Lace Trim Bralette,"Unlined lace-trim bralette with a wire-free, comfort-first construction.",25/7/26 17:41,25/7/26 17:41
+37,161,Cotton Boxer Briefs 3-Pack,Everyday cotton boxer briefs with a supportive contour pouch.,25/7/26 17:41,25/7/26 17:41
+38,201,Slim-Fit Stretch Denim Jeans,Comfortable indigo denim with 2% elastane for flexible movement.,25/7/26 17:41,25/7/26 17:41
+39,201,High-Rise Mom Jeans,Vintage-inspired high-rise jeans with a relaxed tapered leg.,25/7/26 17:41,25/7/26 17:41
+40,201,Skinny Fit Ankle Jeans,Stretch skinny jeans cropped at the ankle for a modern silhouette.,25/7/26 17:41,25/7/26 17:41
+41,201,Straight Leg Raw Denim Jeans,"Classic straight-leg jeans in raw, unwashed selvedge-style denim.",25/7/26 17:41,25/7/26 17:41
+42,202,Denim Pencil Skirt,Fitted knee-length denim skirt with a back vent for ease of movement.,25/7/26 17:41,25/7/26 17:41
+43,202,Denim Shirt Dress,Button-through denim dress cinched with a removable fabric belt.,25/7/26 17:41,25/7/26 17:41
+44,202,Distressed Denim Shorts,Cut-off denim shorts with light distressing and a frayed hem.,25/7/26 17:41,25/7/26 17:41
+45,211,Tailored Slim Fit Trousers,Smart tailored trousers with a flat front and tapered leg.,25/7/26 17:41,25/7/26 17:41
+46,211,Wide Leg Palazzo Pants,Flowing wide-leg pants in lightweight fabric with an elasticated waist.,25/7/26 17:41,25/7/26 17:41
+47,211,Cargo Utility Pants,Relaxed cargo pants with multiple pockets and an adjustable hem.,25/7/26 17:41,25/7/26 17:41
+48,211,Pleated Formal Pants,Pleated-front dress pants with a tailored straight leg.,25/7/26 17:41,25/7/26 17:41
+49,212,Chino Bermuda Shorts,Knee-length chino shorts with a classic flat-front tailored look.,25/7/26 17:41,25/7/26 17:41
+50,212,Drawstring Sweat Shorts,Casual fleece shorts with an elastic drawstring waist.,25/7/26 17:41,25/7/26 17:41
+51,212,Tailored Linen Shorts,Breathable linen-blend shorts with a smart tailored finish.,25/7/26 17:41,25/7/26 17:41
+52,221,Pleated Midi Skirt,Flowing pleated midi skirt with an elasticated waistband.,25/7/26 17:41,25/7/26 17:41
+53,221,A-Line Mini Skirt,Structured A-line mini skirt with a hidden back zip closure.,25/7/26 17:41,25/7/26 17:41
+54,221,Wrap Style Maxi Skirt,Floor-length wrap skirt with a side tie for an adjustable fit.,25/7/26 17:41,25/7/26 17:41
+55,301,Floral Print Summer Midi Dress,Lightweight chiffon dress featuring a wrap front and floral pattern.,25/7/26 17:41,25/7/26 17:41
+56,301,Bodycon Ribbed Midi Dress,Fitted ribbed knit dress that skims the body for a sleek silhouette.,25/7/26 17:41,25/7/26 17:41
+57,301,Off-Shoulder Maxi Dress,Flowing maxi dress with an off-shoulder neckline and elastic bodice.,25/7/26 17:41,25/7/26 17:41
+58,301,Shirt Dress with Belt,Button-front shirt dress with a tie belt for a defined waist.,25/7/26 17:41,25/7/26 17:41
+59,302,Wide Leg Utility Jumpsuit,Sleeveless jumpsuit with a fitted waist and wide-leg trousers.,25/7/26 17:41,25/7/26 17:41
+60,302,Belted Linen Romper,Short linen-blend romper with a self-tie belt at the waist.,25/7/26 17:41,25/7/26 17:41
+61,302,Tailored Tapered Jumpsuit,Long-sleeve jumpsuit with a tapered leg and structured collar.,25/7/26 17:41,25/7/26 17:41
+62,401,Classic Leather Loafers,Slip-on leather loafers with a cushioned footbed and stacked heel.,25/7/26 17:41,25/7/26 17:41
+63,401,Block Heel Ankle Boots,Versatile ankle boots with a stable block heel and side zip.,25/7/26 17:41,25/7/26 17:41
+64,401,Espadrille Flat Sandals,Woven jute-sole espadrilles with a fabric upper and ankle tie.,25/7/26 17:41,25/7/26 17:41
+65,401,Pointed Toe Flats,Sleek pointed-toe flats in smooth faux leather for everyday wear.,25/7/26 17:41,25/7/26 17:41
+66,401,Platform Chunky Sandals,Statement platform sandals with an adjustable ankle strap.,25/7/26 17:41,25/7/26 17:41
+67,402,Low-Top Canvas Sneakers,Everyday canvas sneakers with a rubber sole and lace-up front.,25/7/26 17:41,25/7/26 17:41
+68,402,Chunky Retro Sneakers,Bold retro-style sneakers with a chunky sole and mixed-material upper.,25/7/26 17:41,25/7/26 17:41
+69,402,Running Performance Sneakers,Lightweight running shoes with breathable mesh and cushioned midsole.,25/7/26 17:41,25/7/26 17:41
+70,402,High-Top Basketball Sneakers,Supportive high-top sneakers with ankle padding and grip outsole.,25/7/26 17:41,25/7/26 17:41
+71,403,Chelsea Ankle Boots,Classic elastic-sided Chelsea boots in smooth leather finish.,25/7/26 17:41,25/7/26 17:41
+72,403,Combat Lace-Up Boots,Rugged combat boots with a lace-up front and chunky lug sole.,25/7/26 17:41,25/7/26 17:41
+73,403,Knee-High Riding Boots,Sleek knee-high boots with a side zip and low block heel.,25/7/26 17:41,25/7/26 17:41
+74,404,Slide Sandals with Footbed,Cushioned slide sandals with a contoured footbed for all-day comfort.,25/7/26 17:41,25/7/26 17:41
+75,404,Strappy Flat Sandals,Minimalist strappy sandals with a buckle ankle closure.,25/7/26 17:41,25/7/26 17:41
+76,404,Sporty Sandals with Velcro,Adjustable sporty sandals with dual velcro straps and grip sole.,25/7/26 17:41,25/7/26 17:41
+77,501,Structured Leather Tote Bag,Spacious structured tote in smooth leather with dual top handles.,25/7/26 17:41,25/7/26 17:41
+78,501,Crossbody Chain Strap Bag,Compact crossbody bag with a metal chain strap and flap closure.,25/7/26 17:41,25/7/26 17:41
+79,501,Canvas Weekender Duffel,"Durable canvas duffel bag with leather trims, ideal for short trips.",25/7/26 17:41,25/7/26 17:41
+80,501,Mini Quilted Shoulder Bag,Quilted mini shoulder bag with a detachable chain strap.,25/7/26 17:41,25/7/26 17:41
+81,502,Silk Blend Neck Scarf,"Lightweight silk-blend scarf in a printed pattern, versatile styling.",25/7/26 17:41,25/7/26 17:41
+82,502,Polarized Aviator Sunglasses,UV-protective aviator sunglasses with polarized lenses.,25/7/26 17:41,25/7/26 17:41
+83,502,Wool Blend Beanie,Ribbed knit beanie in a warm wool blend for cold-weather wear.,25/7/26 17:41,25/7/26 17:41
+84,503,Layered Chain Necklace Set,Set of three layered chain necklaces in a mixed-metal finish.,25/7/26 17:41,25/7/26 17:41
+85,503,Hoop Earrings Gold Tone,Classic gold-tone hoop earrings with a lightweight hollow design.,25/7/26 17:41,25/7/26 17:41
+86,503,Beaded Stretch Bracelet Set,Stackable beaded stretch bracelets sold as a set of five.,25/7/26 17:41,25/7/26 17:41
+87,504,Reversible Leather Belt,Two-in-one reversible belt in black and brown leather finishes.,25/7/26 17:41,25/7/26 17:41
+88,504,Woven Braided Belt,Casual braided belt in woven leather-look material.,25/7/26 17:41,25/7/26 17:41
+89,504,Wide Waist Cinch Belt,Statement wide belt designed to cinch and define the waist.,25/7/26 17:41,25/7/26 17:41
+90,505,Structured Baseball Cap,Adjustable structured cap with an embroidered front panel.,25/7/26 17:41,25/7/26 17:41
+91,505,Wide Brim Straw Hat,Sun-ready wide brim hat woven from natural straw fiber.,25/7/26 17:41,25/7/26 17:41
+92,505,Bucket Hat in Cotton Twill,Casual cotton twill bucket hat with a foldable brim.,25/7/26 17:41,25/7/26 17:41
+93,601,Kids Graphic Print Tee,Soft cotton tee for kids featuring a fun printed graphic.,25/7/26 17:41,25/7/26 17:41
+94,601,Kids Fleece Jogger Pants,Comfortable fleece joggers with an elastic waist for active kids.,25/7/26 17:41,25/7/26 17:41
+95,601,Kids Zip-Up Hoodie,Warm zip-up hoodie for kids with a soft brushed interior.,25/7/26 17:41,25/7/26 17:41
+96,601,Kids Denim Overalls,Adjustable strap denim overalls with a relaxed fit for play.,25/7/26 17:41,25/7/26 17:41
+97,701,Plus Size Wrap Midi Dress,Flattering wrap midi dress cut generously through the body and sleeves.,25/7/26 17:41,25/7/26 17:41
+98,701,Plus Size High-Rise Jeans,High-rise stretch jeans tailored with extra room through the hip and thigh.,25/7/26 17:41,25/7/26 17:41
+99,701,Plus Size Longline Cardigan,"Soft knit longline cardigan designed for a relaxed, comfortable fit.",25/7/26 17:41,25/7/26 17:41
+100,701,Plus Size Tailored Blazer,Structured blazer tailored with adjusted proportions for a polished fit.,25/7/26 17:41,25/7/26 17:41
