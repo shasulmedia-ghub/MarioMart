@@ -1,153 +1,186 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
-import "../App.css";
-import mmlogo from "../assets/MM_logo/MarioMart_Logo.jpg";
+
+import { useAuth } from "../context/AuthContext";
+
+// Optional logo
+// import Logo from "../assets/logo/mariomart-logo.png";
 
 function Navbar() {
 
-  // Change this to true after login
-  const isLoggedIn = false;
+  const navigate = useNavigate();
 
-  const imgStyle = {
-  height: "200px",
-  width: "200px",
-  borderRadius: "50%",
-  margin: "10px",
-};
+  const {
+
+    user,
+
+    logout,
+
+    isAuthenticated,
+
+  } = useAuth();
+
+  const handleLogout = () => {
+
+    logout();
+
+    navigate("/");
+
+  };
 
   return (
-    // <nav className="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm sticky-top">
-    //   <div className="container">
-    
-    <nav>
-        <div>
+
+    <nav className="navbar navbar-expand-lg navbar-dark bg-danger shadow sticky-top">
+
+      <div className="container">
 
         {/* Logo */}
-        <Link className="section-title" to="/">
-          <img src={mmlogo} alt="MM_Logo" style={imgStyle} />
-          Welcome to MarioMart
+
+        <Link className="navbar-brand fw-bold fs-3" to="/">
+          🍄 MarioMart
         </Link>
 
-        {/* Mobile Toggle */}
+        {/*
+        <Link className="navbar-brand" to="/">
+            <img src={Logo} height="50" alt="MarioMart"/>
+        </Link>
+        */}
+
         <button
           className="navbar-toggler"
-          type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Navigation */}
-        <div className="collapse navbar-collapse" id="navbarNav">
+        <div
+          className="collapse navbar-collapse"
+          id="navbarNav"
+        >
 
-          {/* Left Menu */}
           <ul className="navbar-nav me-auto">
 
             <li className="nav-item">
+
               <NavLink
                 className="nav-link"
                 to="/"
               >
                 Home
               </NavLink>
+
             </li>
 
-            {isLoggedIn && (
+            {isAuthenticated && (
+
               <li className="nav-item">
+
                 <NavLink
                   className="nav-link"
                   to="/dashboard"
                 >
                   Dashboard
                 </NavLink>
+
               </li>
+
             )}
 
           </ul>
 
-          {/* Right Menu */}
           <ul className="navbar-nav align-items-center">
 
-            {isLoggedIn ? (
+            {isAuthenticated ? (
+
               <>
+
                 <li className="nav-item me-3">
+
                   <NavLink
                     className="nav-link"
                     to="/cart"
                   >
                     <FaShoppingCart size={20} />
                   </NavLink>
+
                 </li>
 
                 <li className="nav-item dropdown">
 
                   <a
-                    className="nav-link dropdown-toggle"
                     href="#!"
-                    role="button"
+                    className="nav-link dropdown-toggle"
                     data-bs-toggle="dropdown"
                   >
-                    <FaUserCircle size={24} /> My Account
+                    <FaUserCircle size={20} />
+
+                    <span className="ms-2">
+
+                      {user.first_name}
+
+                    </span>
+
                   </a>
 
                   <ul className="dropdown-menu dropdown-menu-end">
 
                     <li>
+
                       <NavLink
                         className="dropdown-item"
                         to="/dashboard"
                       >
                         Dashboard
                       </NavLink>
+
                     </li>
 
                     <li>
-                      <NavLink
-                        className="dropdown-item"
-                        to="/profile"
-                      >
-                        Profile
-                      </NavLink>
-                    </li>
 
-                    <li>
-                      <hr className="dropdown-divider" />
-                    </li>
-
-                    <li>
-                      <NavLink
+                      <button
                         className="dropdown-item text-danger"
-                        to="/logout"
+                        onClick={handleLogout}
                       >
                         Logout
-                      </NavLink>
+                      </button>
+
                     </li>
 
                   </ul>
 
                 </li>
+
               </>
+
             ) : (
+
               <>
+
                 <li className="nav-item">
+
                   <NavLink
                     className="nav-link"
-                    to="/login"
+                    to="/pages/login"
                   >
                     Login
                   </NavLink>
+
                 </li>
 
-                <li className="nav-item ms-2">
+                <li className="nav-item ms-3">
+
                   <NavLink
-                    className="btn btn-warning text-dark fw-bold px-4"
-                    to="/register"
+                    className="btn btn-warning fw-bold px-4"
+                    to="/pages/register"
                   >
                     Register
                   </NavLink>
+
                 </li>
+
               </>
+
             )}
 
           </ul>
@@ -155,8 +188,11 @@ function Navbar() {
         </div>
 
       </div>
+
     </nav>
+
   );
+
 }
 
 export default Navbar;
