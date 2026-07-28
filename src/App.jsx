@@ -1,27 +1,53 @@
-import React from 'react';
-import './App.css';
-import Products from './component/Products.jsx';
-import Navbar from './component/navbar.jsx';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-//import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from "./pages/home";
+import Login from "./pages/login";
+import Register from "./pages/register";
+import Dashboard from "./pages/dashboard";
+
+import ProtectedRoute from "./component/ProtectedRoute";
 
 function App() {
   return (
-    <>
-      <h1 className="section-title">Welcome to MarioMart</h1>
+    <BrowserRouter>
+      <Routes>
 
-      {/* <h2 className='mario-header'>Nav Bar on top</h2> */}
+        {/* Public Routes */}
 
-      <Navbar />
+        <Route path="/" element={<Home />} />
 
-      <Products/>
+        <Route path="/pages/login" element={<Login />} />
 
-      <footer className="mario-footer">
-        <p className="mario-footer-credits">Copyright Capstone Project by Shahul, Johnny and YingTong</p>
-      </footer>
-    </>
+        <Route path="/pages/register" element={<Register />} />
+
+        {/* Protected Route */}
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 404 */}
+
+        <Route
+          path="*"
+          element={
+            <div
+              className="container text-center py-5"
+            >
+              <h1>404</h1>
+              <h4>Page Not Found</h4>
+            </div>
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
   );
 }
 
 export default App;
-
