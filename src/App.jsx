@@ -1,53 +1,66 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import Home from "./pages/home";
-import Login from "./pages/login";
-import Register from "./pages/register";
-import Dashboard from "./pages/dashboard";
-
+import { lazy, Suspense } from "react";
+import LoadingSpinner from "./component/LoadingSpinner";
 import ProtectedRoute from "./component/ProtectedRoute";
+const Home = lazy(() => import("./pages/home"));
+const Login = lazy(() => import("./pages/login"));
+const Register = lazy(() => import("./pages/Register"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
 
-        {/* Public Routes */}
+    return (
 
-        <Route path="/" element={<Home />} />
+        <BrowserRouter>
 
-        <Route path="/pages/login" element={<Login />} />
-
-        <Route path="/pages/register" element={<Register />} />
-
-        {/* Protected Route */}
-
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* 404 */}
-
-        <Route
-          path="*"
-          element={
-            <div
-              className="container text-center py-5"
+            <Suspense
+                fallback={<LoadingSpinner />}
             >
-              <h1>404</h1>
-              <h4>Page Not Found</h4>
-            </div>
-          }
-        />
 
-      </Routes>
-    </BrowserRouter>
-  );
+                <Routes>
+
+                    <Route
+                        path="/"
+                        element={<Home />}
+                    />
+
+                    <Route
+                        path="/pages/login"
+                        element={<Login />}
+                    />
+
+                    <Route
+                        path="/pages/register"
+                        element={<Register />}
+                    />
+
+                    <Route
+                        path="/pages/dashboard"
+                        element={
+
+                            <ProtectedRoute>
+
+                                <Dashboard />
+
+                            </ProtectedRoute>
+
+                        }
+                    />
+
+                    <Route
+                        path="*"
+                        element={<NotFound />}
+                    />
+
+                </Routes>
+
+            </Suspense>
+
+        </BrowserRouter>
+
+    );
+
 }
 
 export default App;
