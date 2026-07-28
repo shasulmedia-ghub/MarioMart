@@ -1,18 +1,31 @@
 import { Link, NavLink } from "react-router-dom";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
+import "../App.css";
+import mmlogo from "../assets/MM_logo/MarioMart_Logo.jpg";
 
 function Navbar() {
 
   // Change this to true after login
   const isLoggedIn = false;
 
+  const imgStyle = {
+  height: "200px",
+  width: "200px",
+  borderRadius: "50%",
+  margin: "10px",
+};
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm sticky-top">
-      <div className="container">
+    // <nav className="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm sticky-top">
+    //   <div className="container">
+    
+    <nav>
+        <div>
 
         {/* Logo */}
         <Link className="section-title" to="/">
-          🍄 Welcome to MarioMart
+          <img src={mmlogo} alt="MM_Logo" style={imgStyle} />
+          Welcome to MarioMart
         </Link>
 
         {/* Mobile Toggle */}
