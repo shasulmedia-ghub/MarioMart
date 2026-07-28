@@ -1,21 +1,24 @@
+import React from 'react';
+import './App.css';
+import Products from './component/Products.jsx';
 
-import './App.css'
+//import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
- 
-
   return (
     <>
-    <h1>Welcome to MarioMart</h1>
+      <h1 className="section-title">Welcome to MarioMart</h1>
 
-    <h2>Main Body</h2>
-    <p>test git push main branch</p>
+      <h2 className='mario-header'>Nav Bar on top</h2>
 
-    <footer className="mario-footer">
-      <p className="mario-footer-credits">Copyright Capstone Project by Shahul, Johnny and YingTong</p>
-    </footer>
-      </>
-  )
+      <Products/>
+
+      <footer className="mario-footer">
+        <p className="mario-footer-credits">Copyright Capstone Project by Shahul, Johnny and YingTong</p>
+      </footer>
+    </>
+  );
 }
 
-export default App
+export default App;
+
