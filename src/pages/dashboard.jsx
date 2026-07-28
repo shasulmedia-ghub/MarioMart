@@ -1,19 +1,28 @@
-import Navbar from "../component/Navbar";
-import Footer from "../component/Footer";
+import Layout from "../component/Layout";
+import PageHeader from "../component/PageHeader";
 import { useAuth } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function Dashboard() {
 
+    const navigate = useNavigate();
     const { user, logout } = useAuth();
 
     if (!user) {
         return <Navigate to="/pages/login" replace />;
     }
 
+      const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
+
     return (
-        <>
-            <Navbar />
+        <Layout>
+
+                <PageHeader 
+                title="Welcome Back"
+                subtitle={` ${user.first_name} ${user.last_name} `}/>
 
             <div
                 className="container py-5"
@@ -21,7 +30,7 @@ function Dashboard() {
             >
                 <div className="row">
 
-                    {/* Welcome Card */}
+                    {/* Welcome Card */}    
 
                     <div className="col-lg-8">
 
@@ -29,7 +38,7 @@ function Dashboard() {
 
                             <div className="card-body p-5">
 
-                                <h2 className="text-danger fw-bold mb-4">
+                                {/* <h2 className="text-danger fw-bold mb-4">
 
                                     Welcome Back 👋
 
@@ -39,7 +48,7 @@ function Dashboard() {
 
                                     {user.first_name} {user.last_name}
 
-                                </h4>
+                                </h4> */}
 
                                 <hr />
 
@@ -69,7 +78,7 @@ function Dashboard() {
 
                                 <button
                                     className="btn btn-danger"
-                                    onClick={logout}
+                                    onClick={handleLogout}
                                 >
                                     Logout
                                 </button>
@@ -121,8 +130,7 @@ function Dashboard() {
                 </div>
             </div>
 
-            <Footer />
-        </>
+        </Layout>
     );
 
 }
