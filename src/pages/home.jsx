@@ -1,11 +1,10 @@
-import Navbar from "../component/navbar";
-import Hero from "../component/hero";
-import Footer from "../component/footer";
+import Layout from "../component/Layout";
+import Hero from "../component/Hero";
 
 function Home() {
   return (
     <>
-      <Navbar />
+      <Layout>
 
       <main>
 
@@ -188,7 +187,7 @@ function Home() {
 
       </main>
 
-      <Footer />
+      </Layout>
     </>
   );  
 }
