@@ -78,10 +78,10 @@ body {
 }
 
 .mario-brand {
-  font-family: var(--font-retro);
-  font-size: 1.4rem;
+  font-family: var(--font-display);
+  font-size: 2rem;
   color: var(--mario-yellow);
-  text-shadow: 2px 2px 0 var(--mario-red-dark);
+  /* text-shadow: 2px 2px 0 var(--mario-red-dark); */
   display: flex;
   align-items: center;
   gap: 10px;
@@ -377,8 +377,8 @@ body {
 }
 
 .mario-footer-credits {
-  font-family: var(--font-retro);
-  font-size: 0.7rem;
+  font-family: var(--font-inter);
+  font-size: 1.1rem;
   color: var(--mario-yellow);
   letter-spacing: 0.5px;
 }
