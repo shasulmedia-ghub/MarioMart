@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LoadingSpinner from "./LoadingSpinner";
 
 function ProtectedRoute({ children }) {
 
@@ -11,23 +12,18 @@ function ProtectedRoute({ children }) {
 
     } = useAuth();
 
-    if (loading) {
+  if (loading) {
 
-        return (
+    return (
 
-            <div
-                className="d-flex justify-content-center align-items-center vh-100"
-            >
+        <LoadingSpinner
 
-                <div className="spinner-border text-danger">
+            message="Authenticating..."
 
-                </div>
+        />
 
-            </div>
-
-        );
-
-    }
+    );
+}
 
     return isAuthenticated
 
