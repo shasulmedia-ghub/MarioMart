@@ -1,0 +1,13 @@
+dummy
+
+{/* Public Application Routes */}
+        <Route path="/" element={<LandingPage userRole={auth?.role} />} />
+        <Route path="/login" element={<UserLogin setAuth={setAuth} />} />
+        
+        {/* Isolated Admin Entry point (Not linked on the main site) */}
+        <Route path="/portal/admin-secure-login" element={<AdminLogin setAuth={setAuth} />} />
+
+        {/* Protected Control Panel */}
+        <Route element={<ProtectedRoute userRole={auth?.role} />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Route>

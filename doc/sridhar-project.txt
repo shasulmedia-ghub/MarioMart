@@ -2,3 +2,7 @@ https://github.com/GuzzuSridhar/ged-capstone
 https://github.com/GuzzuSridhar/node-auth
 
 https://lucid.app/lucidchart/80031fdf-085e-41e3-8a6f-764c8e5cd73b/edit?invitationId=inv_726a433f-54f6-41c9-9b95-16d0abf85a0b&page=0_0#
+https://lucid.app/lucidchart/80031fdf-085e-41e3-8a6f-764c8e5cd73b/edit?invitationId=inv_726a433f-54f6-41c9-9b95-16d0abf85a0b&page=0_0#
+
+wireframes (no need to be exactly the same as this, this is just an overview/preview)
+https://stitch.withgoogle.com/projects/12641404451240845266
