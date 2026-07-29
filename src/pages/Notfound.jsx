@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import ROUTES from "../constants/routes";
 
 function NotFound() {
 
@@ -19,30 +20,22 @@ function NotFound() {
                 <h1
                     className="display-1 fw-bold text-danger"
                 >
-
                     404
-
                 </h1>
 
                 <h2>
-
                     Oops!
-
                 </h2>
 
                 <p className="text-muted">
-
                     The page you requested doesn't exist.
-
                 </p>
 
                 <Link
-                    to="/"
+                    to={ROUTES.HOME}
                     className="btn btn-danger btn-lg"
                 >
-
                     Back to Home
-
                 </Link>
 
             </div>

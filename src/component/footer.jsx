@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import "../App.css";
 import mmlogo from "../assets/mm_logo/mariomart_logo.jpg";
+import ROUTES from "../constants/routes";
 
   const imgStyle = {
   height: "50px",
@@ -101,7 +102,7 @@ function Footer() {
               <li className="mario-footer-credits">
               {/* <li className="mb-2"> */}
                 <Link
-                  to="/"
+                  to={ROUTES.HOME}
                   className="text-decoration-none text-secondary"
                 >
                   Home
@@ -110,7 +111,7 @@ function Footer() {
 
               <li className="mb-2">
                 <Link
-                  to="/pages/login"
+                  to={ROUTES.LOGIN}
                   className="text-decoration-none text-secondary"
                 >
                   Login
@@ -119,7 +120,7 @@ function Footer() {
 
               <li className="mb-2">
                 <Link
-                  to="/pages/register"
+                  to={ROUTES.REGISTER}
                   className="text-decoration-none text-secondary"
                 >
                   Register
@@ -128,7 +129,7 @@ function Footer() {
 
               <li className="mb-2">
                 <Link
-                  to="/pages/dashboard"
+                  to={ROUTES.DASHBOARD}
                   className="text-decoration-none text-secondary"
                 >
                   Dashboard

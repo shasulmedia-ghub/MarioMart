@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Layout from "../component/Layout";
 import PageHeader from "../component/PageHeader";
+import ROUTES from "../constants/routes";
 
 function Register() {
 
@@ -24,7 +25,6 @@ function Register() {
   const handleChange = (e) => {
 
     const { name, value, type, checked } = e.target;
-
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -33,7 +33,6 @@ function Register() {
   };
 
   const handleSubmit = (e) => {
-
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -49,7 +48,6 @@ function Register() {
   };
 
   const passwordStrength = () => {
-
     const password = formData.password;
 
     if (password.length < 6)
@@ -79,21 +77,13 @@ function Register() {
   return (
     <Layout>
 
-
-
       <div
         className="container py-5"
         style={{ minHeight: "80vh" }}
       >
-
-
-
         <div className="row justify-content-center">
-
           <div className="col-lg-8">
-
             <div className="card shadow-lg border-0 rounded-4">
-
               <div className="card-body p-5">
 
                 {/* <h2 className="text-center fw-bold text-danger mb-4">
@@ -106,9 +96,7 @@ function Register() {
                 <br />
 
                 <form onSubmit={handleSubmit}>
-
                   <div className="row">
-
                     <div className="col-md-6 mb-3">
 
                       <label className="form-label">
@@ -122,7 +110,6 @@ function Register() {
                         required
                         onChange={handleChange}
                       />
-
                     </div>
 
                     <div className="col-md-6 mb-3">
@@ -138,7 +125,6 @@ function Register() {
                         required
                         onChange={handleChange}
                       />
-
                     </div>
 
                   </div>
@@ -156,7 +142,6 @@ function Register() {
                       required
                       onChange={handleChange}
                     />
-
                   </div>
 
                   <div className="row">
@@ -212,15 +197,11 @@ function Register() {
                         required
                         onChange={handleChange}
                       />
-
                     </div>
-
                   </div>
 
                   <div className="row">
-
                     <div className="col-md-6 mb-3">
-
                       <label className="form-label">
                         Gender
                       </label>
@@ -254,7 +235,6 @@ function Register() {
                         required
                         onChange={handleChange}
                       />
-
                     </div>
 
                   </div>
@@ -271,7 +251,6 @@ function Register() {
                       className="form-control"
                       onChange={handleChange}
                     />
-
                   </div>
 
                   <div className="form-check mb-2">
@@ -302,7 +281,6 @@ function Register() {
                     <label className="form-check-label">
                       I agree to the Terms & Conditions.
                     </label>
-
                   </div>
 
                   <button
@@ -310,15 +288,13 @@ function Register() {
                   >
                     Create Account
                   </button>
-
                 </form>
 
                 <div className="text-center mt-4">
-
                   Already have an account?
 
                   <Link
-                    to="/pages/login"
+                    to={ROUTES.LOGIN}
                     className="ms-2 fw-bold text-decoration-none"
                   >
                     Login Here

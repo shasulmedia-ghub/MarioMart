@@ -7,6 +7,7 @@ const Login = lazy(() => import("./pages/login"));
 const Register = lazy(() => import("./pages/Register"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+import ROUTES from "../constants/routes";
 
 function App() {
 
@@ -21,22 +22,22 @@ function App() {
                 <Routes>
 
                     <Route
-                        path="/"
+                        path={ROUTES.HOME}
                         element={<Home />}
                     />
 
                     <Route
-                        path="/pages/login"
+                        path={ROUTES.LOGIN}
                         element={<Login />}
                     />
 
                     <Route
-                        path="/pages/register"
+                        path={ROUTES.REGISTER}
                         element={<Register />}
                     />
 
                     <Route
-                        path="/pages/dashboard"
+                        path={ROUTES.DASHBOARD}
                         element={
 
                             <ProtectedRoute>
@@ -49,7 +50,7 @@ function App() {
                     />
 
                     <Route
-                        path="*"
+                        path={ROUTES.NOT_FOUND}
                         element={<NotFound />}
                     />
 

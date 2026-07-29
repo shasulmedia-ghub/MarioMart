@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaShoppingCart, FaUserCircle } from "react-icons/fa";
 
 import { useAuth } from "../context/AuthContext";
+import ROUTES from "../constants/routes";
 
 // Optional logo
 // import Logo from "../assets/logo/mariomart-logo.png";
@@ -11,13 +12,9 @@ function Navbar() {
   const navigate = useNavigate();
 
   const {
-
     user,
-
     logout,
-
     isAuthenticated,
-
   } = useAuth();
 
   const handleLogout = () => {
@@ -33,7 +30,7 @@ function Navbar() {
 
         {/* Logo */}
 
-        <Link className="navbar-brand fw-bold fs-3" to="/">
+        <Link className="navbar-brand fw-bold fs-3" to={ROUTES.HOME}>
           🍄 MarioMart
         </Link>
 
@@ -62,7 +59,7 @@ function Navbar() {
 
               <NavLink
                 className="nav-link"
-                to="/"
+                to={ROUTES.HOME}
               >
                 Home
               </NavLink>
@@ -75,7 +72,7 @@ function Navbar() {
 
                 <NavLink
                   className="nav-link"
-                  to="/pages/dashboard"
+                  to={ROUTES.DASHBOARD}
                 >
                   Dashboard
                 </NavLink>
@@ -96,7 +93,7 @@ function Navbar() {
 
                   <NavLink
                     className="nav-link"
-                    to="/cart"
+                    to={ROUTES.CART}
                   >
                     <FaShoppingCart size={20} />
                   </NavLink>
@@ -126,7 +123,7 @@ function Navbar() {
 
                       <NavLink
                         className="dropdown-item"
-                        to="/pages/dashboard"
+                        to={ROUTES.DASHBOARD}
                       >
                         Dashboard
                       </NavLink>
@@ -158,7 +155,7 @@ function Navbar() {
 
                   <NavLink
                     className="nav-link"
-                    to="/pages/login"
+                    to={ROUTES.LOGIN}
                   >
                     Login
                   </NavLink>
@@ -169,7 +166,7 @@ function Navbar() {
 
                   <NavLink
                     className="btn btn-warning fw-bold px-4"
-                    to="/pages/register"
+                    to={ROUTES.REGISTER}
                   >
                     Register
                   </NavLink>
