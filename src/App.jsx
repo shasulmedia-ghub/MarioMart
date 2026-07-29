@@ -7,7 +7,11 @@ const Login = lazy(() => import("./pages/login"));
 const Register = lazy(() => import("./pages/Register"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+<<<<<<< Updated upstream
 import ROUTES from "./constants/routes";
+=======
+import ROUTES from "../constants/routes";
+>>>>>>> Stashed changes
 
 function App() {
 
