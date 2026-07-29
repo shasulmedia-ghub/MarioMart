@@ -7,7 +7,7 @@ const Login = lazy(() => import("./pages/login"));
 const Register = lazy(() => import("./pages/Register"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-import ROUTES from "../constants/routes";
+import ROUTES from "./constants/routes";
 
 function App() {
 
