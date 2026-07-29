@@ -12,15 +12,11 @@ import ROUTES from "./constants/routes";
 function App() {
 
     return (
-
         <BrowserRouter>
-
             <Suspense
                 fallback={<LoadingSpinner />}
             >
-
                 <Routes>
-
                     <Route
                         path={ROUTES.HOME}
                         element={<Home />}
