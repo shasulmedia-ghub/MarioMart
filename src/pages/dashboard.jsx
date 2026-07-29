@@ -2,6 +2,7 @@ import Layout from "../component/Layout";
 import PageHeader from "../component/PageHeader";
 import { useAuth } from "../context/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
+import ROUTES from "../constants/routes"
 
 function Dashboard() {
 
@@ -9,12 +10,12 @@ function Dashboard() {
     const { user, logout } = useAuth();
 
     if (!user) {
-        return <Navigate to="/pages/login" replace />;
+        return <Navigate to={ROUTES.LOGIN} replace />;
     }
 
       const handleLogout = () => {
     logout();
-    navigate("/", { replace: true });
+    navigate(ROUTES.HOME, { replace: true });
   };
 
     return (
@@ -33,9 +34,7 @@ function Dashboard() {
                     {/* Welcome Card */}    
 
                     <div className="col-lg-8">
-
                         <div className="card shadow border-0 rounded-4">
-
                             <div className="card-body p-5">
 
                                 {/* <h2 className="text-danger fw-bold mb-4">
@@ -53,25 +52,16 @@ function Dashboard() {
                                 <hr />
 
                                 <div className="row">
-
                                     <div className="col-md-6 mb-3">
-
                                         <strong>Email</strong>
-
                                         <p>{user.email}</p>
-
                                     </div>
 
                                     <div className="col-md-6 mb-3">
-
                                         <strong>Role</strong>
-
                                         <p className="text-capitalize">
-
                                             {user.role}
-
                                         </p>
-
                                     </div>
 
                                 </div>
@@ -82,7 +72,6 @@ function Dashboard() {
                                 >
                                     Logout
                                 </button>
-
                             </div>
 
                         </div>

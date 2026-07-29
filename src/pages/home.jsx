@@ -1,5 +1,6 @@
 import Layout from "../component/Layout";
 import Hero from "../component/Hero";
+import ROUTES from "../constants/routes";
 
 function Home() {
   return (

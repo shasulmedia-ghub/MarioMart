@@ -19,7 +19,7 @@ function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/", { replace: true });
+    navigate(ROUTES.HOME, { replace: true });
   };
 
   return (

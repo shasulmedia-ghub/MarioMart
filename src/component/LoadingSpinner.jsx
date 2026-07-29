@@ -1,15 +1,11 @@
 function LoadingSpinner({
-
     message = "Loading...",
-
     fullscreen = true,
 
 }) {
 
     const spinner = (
-
         <div className="text-center">
-
             <div
                 className="spinner-border text-danger"
                 style={{
@@ -19,9 +15,7 @@ function LoadingSpinner({
             />
 
             <h5 className="mt-4 text-secondary">
-
                 {message}
-
             </h5>
 
         </div>
@@ -29,9 +23,7 @@ function LoadingSpinner({
     );
 
     if (!fullscreen) {
-
         return spinner;
-
     }
 
     return (
@@ -45,7 +37,6 @@ function LoadingSpinner({
         >
 
             {spinner}
-
         </div>
 
     );
