@@ -1,6 +1,9 @@
 import React from 'react';
 import './App.css';
 import Products from './component/Products.jsx';
+import ProductsData from './component/ProductsData.jsx';
+import UserProducts from './component/UserProducts.jsx';
+import ProductDetails from './component/ProductDetails';
 
 //import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -11,7 +14,12 @@ function App() {
 
       <h2 className='mario-header'>Nav Bar on top</h2>
 
-      <Products/>
+      {/* <Products/> */}
+      {/* <ProductsData/> */}
+      <UserProducts/>
+
+      
+
 
       <footer className="mario-footer">
         <p className="mario-footer-credits">Copyright Capstone Project by Shahul, Johnny and YingTong</p>

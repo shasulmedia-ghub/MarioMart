@@ -1,183 +1,118 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// Categories mapping helper
-const CATEGORIES = {
-  1: 'Power-ups',
-  2: 'Items & Weapons',
-  3: 'Outfits & Suits'
+// Modern clean fallback map layout tracker if any values are missing strings
+const CATEGORIES_DISPLAY_NAMES = {
+  'Power-Up': 'Power-ups',
+  'Invincibility': 'Items & Weapons',
+  'Gear': 'Outfits & Suits'
 };
 
-// Column definitions for the PRODUCTS Table
-const DB_PRODUCTS_COLUMNS = [
-  { name: 'id', type: 'UUID_or_INT', label: 'Product ID (Primary Key)' },
-  { name: 'sku', type: 'VARCHAR(100) UNIQUE', label: 'Stock Keeping Unit (SKU)' },
-  { name: 'category_id', type: 'INT', label: 'Category ID (Foreign Key)' },
-  { name: 'name', type: 'VARCHAR(255)', label: 'Product Name' },
-  { name: 'description', type: 'TEXT', label: 'Detailed Description' },
-  { name: 'price', type: 'DECIMAL(10,2)', label: 'Unit Price' },
-  { name: 'image_url', type: 'VARCHAR(255)', label: 'Image Resource Path' },
-  { name: 'created_at', type: 'TIMESTAMP', label: 'Created Time' },
-  { name: 'updated_at', type: 'TIMESTAMP', label: 'Last Updated Time' }
-];
-
-// Column definitions for the INVENTORY Table
-const DB_INVENTORY_COLUMNS = [
-  { name: 'product_id', type: 'VARCHAR(50)', label: 'Product ID (Foreign Key)' },
-  { name: 'stock_quantity', type: 'INT', label: 'Stock Quantity Level' },
-  { name: 'updated_at', type: 'TIMESTAMP', label: 'Last Stock Update Time' }
-];
-
-// MOCK_PRODUCTS representing the Products table (no stock_quantity here)
-const MOCK_PRODUCTS = [
-  {
-    id: "prod-001",
-    sku: "MM-MUSH-001",
-    category_id: 1,
-    name: "Super Mushroom",
-    description: "A classic power-up item! Makes the user grow twice their normal size, allowing them to break brick blocks and survive an extra hit.",
-    price: 10.00,
-    image_url: "🍄",
-    created_at: "2026-07-01T08:00:00Z",
-    updated_at: "2026-07-20T10:15:00Z"
-  },
-  {
-    id: "prod-002",
-    sku: "MM-FLOW-002",
-    category_id: 1,
-    name: "Fire Flower",
-    description: "Grants the power to throw bouncing fireballs that defeat enemies from a distance. Great for lighting up dark caves!",
-    price: 25.00,
-    image_url: "🔥",
-    created_at: "2026-07-02T09:30:00Z",
-    updated_at: "2026-07-18T14:45:00Z"
-  },
-  {
-    id: "prod-003",
-    sku: "MM-STAR-003",
-    category_id: 1,
-    name: "Super Star",
-    description: "Become completely invincible to all hazards and enemies for a limited time! Grants a speed boost and a dazzling rainbow glow.",
-    price: 99.99,
-    image_url: "🌟",
-    created_at: "2026-07-03T11:00:00Z",
-    updated_at: "2026-07-22T08:00:00Z"
-  },
-  {
-    id: "prod-004",
-    sku: "MM-SHEL-004",
-    category_id: 2,
-    name: "Green Shell",
-    description: "A versatile projectile that can be kicked to slide along the ground and defeat enemies. Watch out for the bounce-back!",
-    price: 5.50,
-    image_url: "🐢",
-    created_at: "2026-07-04T13:15:00Z",
-    updated_at: "2026-07-15T09:00:00Z"
-  },
-  {
-    id: "prod-005",
-    sku: "MM-SUIT-005",
-    category_id: 3,
-    name: "Tanooki Suit",
-    description: "A magical suit that grants the ability to flutter-jump, glide through the air, and transform into an invincible stone statue.",
-    price: 75.00,
-    image_url: "🦝",
-    created_at: "2026-07-05T14:00:00Z",
-    updated_at: "2026-07-12T16:20:00Z"
-  },
-  {
-    id: "prod-006",
-    sku: "MM-YEGG-006",
-    category_id: 2,
-    name: "Yoshi Egg",
-    description: "Hatch your very own loyal dinosaur companion! Yoshi can eat enemies, flutter jump, and carry you safely through dangerous terrains.",
-    price: 50.00,
-    image_url: "🥚",
-    created_at: "2026-07-06T10:00:00Z",
-    updated_at: "2026-07-21T11:55:00Z"
-  }
-];
-
-// MOCK_INVENTORY representing the separate Inventory table/database
-const MOCK_INVENTORY = [
-  { product_id: "prod-001", stock_quantity: 45, updated_at: "2026-07-20T10:15:00Z" },
-  { product_id: "prod-002", stock_quantity: 15, updated_at: "2026-07-18T14:45:00Z" },
-  { product_id: "prod-003", stock_quantity: 1,  updated_at: "2026-07-22T08:00:00Z" },
-  { product_id: "prod-004", stock_quantity: 80, updated_at: "2026-07-15T09:00:00Z" },
-  { product_id: "prod-005", stock_quantity: 0,  updated_at: "2026-07-12T16:20:00Z" },
-  { product_id: "prod-006", stock_quantity: 7,  updated_at: "2026-07-21T11:55:00Z" }
-];
-
-// Database join lookup helpers
-const getProductStockRecord = (productId) => {
-  return MOCK_INVENTORY.find(item => item.product_id === productId) || {
-    product_id: productId,
-    stock_quantity: 0,
-    updated_at: new Date().toISOString()
-  };
-};
-
-const getProductStockQuantity = (productId) => {
-  return getProductStockRecord(productId).stock_quantity;
-};
-
-function Products({ onAddToCart = () => {} }) {
+function UserProducts({ onAddToCart = () => {} }) {
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]); // ✅ ADDED: State to hold database categories
+  const [inventory, setInventory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [sortBy, setSortBy] = useState('name-asc');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Stock badge styling helper
+  // Fetch data from your backend API on component mount
+  useEffect(() => {
+    const fetchShopData = async () => {
+      try {
+        // 1. Fetch products from database
+        const prodResponse = await fetch('https://mm-api-virid.vercel.app/api/products');
+        if (!prodResponse.ok) throw new Error('Failed to fetch shop products');
+        const prodData = await prodResponse.json();
+        setProducts(prodData);
+        
+        // 2. ✅ ADDED: Fetch live categories from database for matching lookups
+        const catResponse = await fetch('https://mm-api-virid.vercel.app/api/categories');
+        if (catResponse.ok) {
+          const catData = await catResponse.json();
+          setCategories(catData);
+        }
+
+        // Map inventory structures safely
+        const mappedInventory = prodData.map(item => ({
+          product_id: item.id,
+          stock_quantity: item.stock_quantity !== undefined ? item.stock_quantity : 15,
+          updated_at: item.inventory_updated_at || item.updated_at
+        }));
+        setInventory(mappedInventory);
+      } catch (err) {
+        console.error("Database connection error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchShopData();
+  }, []);
+
+  const getProductStockRecord = (productId) => {
+    return inventory.find(item => item.product_id === productId) || {
+      product_id: productId,
+      stock_quantity: 15,
+      updated_at: new Date().toISOString()
+    };
+  };
+
+  const getProductStockQuantity = (productId) => {
+    return getProductStockRecord(productId).stock_quantity;
+  };
+
   const getStockDetails = (qty) => {
-    if (qty === 0) {
-      return { className: 'stock-out', label: 'OUT OF STOCK' };
-    }
-    if (qty === 1) {
-      return { className: 'stock-low', label: 'LAST ITEM LEFT!' };
-    }
-    if (qty < 10) {
-      return { className: 'stock-low', label: 'LOW STOCK (< 10 LEFT)' };
-    }
+    if (qty === 0) return { className: 'stock-out', label: 'OUT OF STOCK' };
+    if (qty === 1) return { className: 'stock-low', label: 'LAST ITEM LEFT!' };
+    if (qty < 10) return { className: 'stock-low', label: 'LOW STOCK (< 10 LEFT)' };
     return { className: 'stock-in', label: 'IN STOCK' };
   };
 
-  // Filter and sort products
+  // Filter and sort products using dynamic properties state data
   const filteredProducts = useMemo(() => {
-    let result = [...MOCK_PRODUCTS];
+    let result = [...products];
 
-    // Category filter
     if (selectedCategory !== null) {
-      result = result.filter(p => p.category_id === selectedCategory);
+      result = result.filter(p => {
+        if (!p.category_id) return false;
+        
+        const catName = typeof p.category_id === 'object' 
+          ? p.category_id.category_name 
+          : p.category_id;
+          
+        const catId = typeof p.category_id === 'object' ? p.category_id.id : p.category_id;
+
+        return String(catId) === String(selectedCategory) || 
+               String(catName).toLowerCase() === String(selectedCategory).toLowerCase();
+      });
     }
 
-    // Search query filter
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
       result = result.filter(p => 
-        p.name.toLowerCase().includes(q) || 
-        p.description.toLowerCase().includes(q)
+        (p.product_name || '').toLowerCase().includes(q) || 
+        (p.description || '').toLowerCase().includes(q)
       );
     }
 
-    // Sorting
     result.sort((a, b) => {
       switch (sortBy) {
-        case 'price-asc':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        case 'name-asc':
-          return a.name.localeCompare(b.name);
-        case 'name-desc':
-          return b.name.localeCompare(a.name);
-        case 'date-desc':
-          return new Date(b.created_at) - new Date(a.created_at);
-        default:
-          return 0;
+        case 'price-asc': return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
+        case 'price-desc': return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
+        case 'name-asc': return (a.product_name || '').localeCompare(b.product_name || '');
+        case 'name-desc': return (b.product_name || '').localeCompare(b.product_name || '');
+        case 'date-desc': return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        default: return 0;
       }
     });
 
     return result;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [products, searchQuery, selectedCategory, sortBy]);
 
   const handleOpenModal = (product) => {
     setSelectedProduct(product);
@@ -187,19 +122,9 @@ function Products({ onAddToCart = () => {} }) {
     setSelectedProduct(null);
   };
 
-  // Format helper for timestamps
-  const formatTimestamp = (isoString) => {
-    const d = new Date(isoString);
-    return d.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      timeZoneName: 'short'
-    });
-  };
+  if (loading) {
+    return <div className="no-results" style={{ textAlign: 'center', padding: '50px' }}>Loading items from database...</div>;
+  }
 
   return (
     <div className="products-section">
@@ -240,20 +165,20 @@ function Products({ onAddToCart = () => {} }) {
             All Items
           </button>
           <button
-            className={`category-btn ${selectedCategory === 1 ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(1)}
+            className={`category-btn ${selectedCategory === 'Power-Up' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('Power-Up')}
           >
             Power-ups
           </button>
           <button
-            className={`category-btn ${selectedCategory === 2 ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(2)}
+            className={`category-btn ${selectedCategory === 'Invincibility' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('Invincibility')}
           >
             Items & Weapons
           </button>
           <button
-            className={`category-btn ${selectedCategory === 3 ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(3)}
+            className={`category-btn ${selectedCategory === 'Gear' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('Gear')}
           >
             Outfits & Suits
           </button>
@@ -268,23 +193,31 @@ function Products({ onAddToCart = () => {} }) {
             const stock = getStockDetails(stockQty);
             const isOutOfStock = stockQty === 0;
 
+            // ✅ FIXED: Category matching block uses CATEGORIES_LOOKUP cleanly
+            const categoryDisplay = (() => {
+              if (product.category_id && typeof product.category_id === 'object') {
+                return product.category_id.category_name;
+              }
+              const match = categories.find(c => String(c.id) === String(product.category_id));
+              if (match) return match.category_name;
+              return CATEGORIES_DISPLAY_NAMES[product.category_id] || product.category_id || "General Item";
+            })();
+
             return (
               <div key={product.id} className="product-card">
-                {/* Product Image Container */}
-                {/* Category Badge */}
-                  <div className="product-badge">
-                    {CATEGORIES[product.category_id]}
-                  </div>
+                <div className="product-badge">
+                  {categoryDisplay}
+                </div>
                 <div className="product-image-container">
-                  
                   <div className="product-image-placeholder">
-                    {product.image_url}
+                    {/* ✅ FIXED: Use image_url emoji (🍄, 🌻) instead of broken image paths */}
+                    {product.image_url || "📦"}
                   </div>
                 </div>
                 
-                {/* Product Info */}
                 <div style={{ textAlign: 'left', marginBottom: '12px' }}>
-                  <div className="product-title">{product.name}</div>
+                  {/* ✅ FIXED: Changed product.name to product.product_name */}
+                  <div className="product-title">{product.product_name || "Unknown Product"}</div>
                   <div style={{ marginBottom: '10px' }}>
                     <span className={`stock-badge ${stock.className}`}>
                       {stock.label}
@@ -292,11 +225,9 @@ function Products({ onAddToCart = () => {} }) {
                   </div>
                 </div>
 
-
-                {/* Product Footer (Price and Actions) */}
                 <div className="product-footer">
                   <div className="product-price">
-                    ${product.price.toFixed(2)}
+                    ${Number(product.price || 0).toFixed(2)}
                   </div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     <button
@@ -315,7 +246,7 @@ function Products({ onAddToCart = () => {} }) {
                     <button
                       className="mario-btn mario-btn-red"
                       style={{ fontSize: '0.65rem', padding: '8px 12px' }}
-                      onClick={() => handleOpenModal(product)}
+                      onClick={() => navigate(`/ProductDetails/${product.id}`, { state: { selectedProduct: product } })}
                     >
                       Details
                     </button>
@@ -345,11 +276,13 @@ function Products({ onAddToCart = () => {} }) {
               </button>
               
               <div className="modal-header-section">
-                <div className="modal-image">
-                  {selectedProduct.image_url}
+                <div className="modal-image" style={{ fontSize: '3rem', textAlign: 'center' }}>
+                  {/* ✅ FIXED: Use image_url emoji instead of broken image_url inside modal */}
+                  {selectedProduct.image_url || "📦"}
                 </div>
                 <div className="modal-title-area">
-                  <h3 className="modal-title">{selectedProduct.name}</h3>
+                  {/* ✅ FIXED: Changed selectedProduct.name to selectedProduct.product_name */}
+                  <h3 className="modal-title">{selectedProduct.product_name || "Unknown Product"}</h3>
                   <span className={`stock-badge ${stock.className}`}>
                     {stock.label}
                   </span>
@@ -371,14 +304,25 @@ function Products({ onAddToCart = () => {} }) {
                 <tbody>
                   {DB_PRODUCTS_COLUMNS.map(col => {
                     let valDisplay = '';
+                    
                     if (col.name === 'category_id') {
-                      valDisplay = `${selectedProduct.category_id} (${CATEGORIES[selectedProduct.category_id]})`;
+                      // ✅ FIXED: Safely unpacks relational objects to avoid [object Object] crashes
+                      const displayCat = selectedProduct.category_id && typeof selectedProduct.category_id === 'object'
+                        ? selectedProduct.category_id.category_name
+                        : (CATEGORIES_DISPLAY_NAMES[selectedProduct.category_id] || selectedProduct.category_id);
+                      valDisplay = String(displayCat || 'General Item');
+                    } else if (col.name === 'name') {
+                      // ✅ FIXED: Maps table visual description tracker back onto your real column key
+                      valDisplay = String(selectedProduct.product_name || '');
+                    } else if (col.name === 'image_url') {
+                      // ✅ FIXED: Redirects preview rows to output emoji fields 
+                      valDisplay = String(selectedProduct.image_url || '📦');
                     } else if (col.name === 'price') {
-                      valDisplay = `$${selectedProduct.price.toFixed(2)}`;
+                      valDisplay = `$${Number(selectedProduct.price || 0).toFixed(2)}`;
                     } else if (col.name === 'created_at' || col.name === 'updated_at') {
                       valDisplay = formatTimestamp(selectedProduct[col.name]);
                     } else {
-                      valDisplay = String(selectedProduct[col.name]);
+                      valDisplay = String(selectedProduct[col.name] ?? '');
                     }
 
                     return (
@@ -415,7 +359,7 @@ function Products({ onAddToCart = () => {} }) {
                     if (col.name === 'updated_at') {
                       valDisplay = formatTimestamp(invRecord[col.name]);
                     } else {
-                      valDisplay = String(invRecord[col.name]);
+                      valDisplay = String(invRecord[col.name] ?? '');
                     }
 
                     return (
@@ -448,9 +392,6 @@ function Products({ onAddToCart = () => {} }) {
                 >
                   Add To Cart
                 </button>
-                <button className="mario-btn mario-btn-red" onClick={handleCloseModal}>
-                  Close
-                </button>
               </div>
             </div>
           </div>
@@ -460,4 +401,4 @@ function Products({ onAddToCart = () => {} }) {
   );
 }
 
-export default Products;
+export default UserProducts;

@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.jsx'
 import AdminLogin from './component/AdminLogin.jsx';
 import AdminDashboard from './component/AdminDashboard.jsx';
+import ProductDetails from './component/ProductDetails.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -15,6 +16,7 @@ createRoot(document.getElementById('root')).render(
         {/* use this to test the AdminLogin and AdminDashboard page */}
         <Route path="/AdminLogin" element={<AdminLogin />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
+        <Route path="/ProductDetails/:id" element={<ProductDetails />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

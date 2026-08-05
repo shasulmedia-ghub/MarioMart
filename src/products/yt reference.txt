@@ -11,3 +11,20 @@ dummy
         <Route element={<ProtectedRoute userRole={auth?.role} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Route>
+
+        To Retrieve Data:
+        useEffect(() => {
+           fetch('https://your-api-domain.com/api/products')
+           .then(response => response.json())
+           .then(data => {
+           setProducts(data);
+           setIsLoading(false);
+           });
+        }, []);
+
+        To Store Data:
+        await fetch('https://your-api-domain.com/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProduct)
+        });
