@@ -1,21 +1,31 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-// FIX: Define CATEGORIES dictionary so your layout doesn't crash on render
-const CATEGORIES = {
-  1: 'Power-ups',
-  2: 'Items & Weapons',
-  3: 'Outfits & Suits'
-};
 
 function ProductDetails() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // FIX: Unpack using 'selectedProduct' to match your button state structure precisely
+  // Unpack using 'selectedProduct' to match your button state structure precisely
   const product = location.state?.selectedProduct;
-  // Fall back to 0 if stock quantity isn't explicitly supplied in payload
   const stockQuantity = location.state?.stockQuantity ?? 0;
+
+  // State to hold fetched database categories for dynamic lookups
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const catResponse = await fetch('https://mm-api-virid.vercel.app/api/categories');
+        if (catResponse.ok) {
+          const catData = await catResponse.json();
+          setCategories(catData);
+        }
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Safeguard view if someone navigates to /ProductDetails directly without choosing an item
   if (!product) {
@@ -27,14 +37,21 @@ function ProductDetails() {
     );
   }
 
+  // Resolve category name dynamically (supporting objects, IDs, or string names)
+  const resolvedCategoryName = (() => {
+    if (product.category_id && typeof product.category_id === 'object') {
+      return product.category_id.category_name || product.category_id.name || "General";
+    }
+    const match = categories.find(c => String(c.id) === String(product.category_id));
+    if (match) return match.category_name || match.name;
+    return product.category_name || product.category_id || "General";
+  })();
+
   return (
-    <>
-    <h2 className='section-title'>Product Details HEADER</h2>
     <div className="app-container" style={{ maxWidth: '600px', margin: '40px auto', padding: '20px' }}>
       
-      {/* Moved your header inside the valid return statement block */}
+      {/* Clean single title header */}
       <h2 className='section-title' style={{ textAlign: 'center', marginBottom: '20px' }}>Product Details</h2>
-      {/* FIX THIS PART to tie in with product name */}
 
       <header className="mario-header" style={{ marginBottom: '20px' }}>
         <div className="mario-brand">🌟 ITEM SPECIFICATIONS</div>
@@ -45,9 +62,14 @@ function ProductDetails() {
           {product.image_url || '📦'}
         </div>
 
-        <h2 className="product-title" style={{ fontSize: '1.8rem', margin: '10px 0' }}>{product.name}</h2>
+        {/* ✅ FIXED: Changed product.name to product.product_name to match your database schema */}
+        <h2 className="product-title" style={{ fontSize: '1.8rem', margin: '10px 0' }}>
+          {product.product_name || "Unknown Product"}
+        </h2>
+        
         <span className="product-badge" style={{ position: 'static', display: 'inline-block', marginBottom: '15px' }}>
-          {CATEGORIES[product.category_id] || 'General'}
+          {/* ✅ FIXED: Uses dynamic database category resolution instead of static map */}
+          {resolvedCategoryName}
         </span>
 
         <p style={{ margin: '10px 0', lineHeight: '1.5' }}>
@@ -67,7 +89,6 @@ function ProductDetails() {
         </div>
       </div>
     </div>
-    </>
   );
 }
 

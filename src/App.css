@@ -573,6 +573,14 @@ body {
   flex-wrap: wrap;
   justify-content: center;
 }
+/* change to this if the category-filters container still clips or cuts off categories on smaller screens
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+} */
 
 .category-btn {
   font-family: var(--font-retro);
