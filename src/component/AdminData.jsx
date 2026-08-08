@@ -8,6 +8,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
   const [productForm, setProductForm] = useState({
     product_name: '',
     category_id: '',
+    description: '',
+    default_image: null, // 👈 Holds the actual file object selected by the admin
     price: '',
     description: '',
     image_url: '🍄',
@@ -21,6 +23,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
   // ==================== PRODUCT CRUD HANDLERS ====================
   
   // const handleOpenAddProduct = () => {
+  
   //   // Determine a safe initial default category ID string or fallback integer
   //   const defaultCat = categories[0] && typeof categories[0] === 'object' 
   //     ? categories[0].id 
@@ -51,6 +54,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
       category_id: defaultCategoryId, // 👈 Guaranteed to be a defined string or ID number
       price: '',
       description: '',
+      default_image: null, // 👈 Reset to null on add
       image_url: '🍄',
       stockQuantity: '50'
     });
@@ -71,6 +75,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
       category_id: currentCategoryId || '',
       price: product.price,
       description: product.description,
+      default_image: null, // 👈 Null by default during edit unless a new file is chosen
       image_url: product.image_url,
       stockQuantity: product.stock_quantity !== undefined && product.stock_quantity !== null 
         ? product.stock_quantity 
@@ -122,6 +127,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
         } : p));
       }
     } else {
+      
       // CREATE Product in database
   //     try {
   //       const res = await fetch('https://mm-api-virid.vercel.app/api/products', {
@@ -207,6 +213,9 @@ export default function AdminData({ products, setProducts, categories, setCatego
   };
 
   const handleOpenEditCategory = (cat) => {
+    // 💡 FIXED: Extract the raw ID if an object is passed, ensuring editingCategory is just the ID
+    const catId = cat && typeof cat === 'object' ? cat.id : cat;
+    setEditingCategory(catId);
     // Support category structure as string or relational object properties safely
     setEditingCategory(cat);
     setCategoryName(typeof cat === 'object' ? cat.category_name : cat);

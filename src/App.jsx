@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Products from './component/Products.jsx';
+import ProductsData from './component/ProductsData.jsx';
+import UserProducts from './component/UserProducts.jsx';
+import ProductDetails from './component/ProductDetails';
+
+//import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Cart from './cart/cart.jsx';
 import Checkout from './checkout/checkout.jsx';
 import OrderHistory from './order/orderHistory.jsx';
@@ -45,6 +50,12 @@ function App() {
       console.warn("Error fetching cart count:", err);
     }
   };
+
+      {/* <Products/> */}
+      {/* <ProductsData/> */}
+      <UserProducts/>
+
+      
 
   useEffect(() => {
     fetchCartCount();
