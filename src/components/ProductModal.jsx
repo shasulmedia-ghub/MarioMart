@@ -105,7 +105,8 @@ console.log(selectedVariant);
         colour: selectedColour,
         size: selectedSize,
         quantity: 1,
-        unitPrice: Number(unitPrice)
+        unitPrice: Number(unitPrice),
+        variantId: selectedVariant.variant_id
       };
 
       const response = await fetch(`https://mm-api-virid.vercel.app/api/cart/`, {
