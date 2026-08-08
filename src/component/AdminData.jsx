@@ -10,6 +10,9 @@ export default function AdminData({ products, setProducts, categories, setCatego
     category_id: '',
     description: '',
     default_image: null, // 👈 Holds the actual file object selected by the admin
+    price: '',
+    description: '',
+    image_url: '🍄',
     stockQuantity: 50
   });
 
@@ -21,6 +24,21 @@ export default function AdminData({ products, setProducts, categories, setCatego
   
   // const handleOpenAddProduct = () => {
   
+  //   // Determine a safe initial default category ID string or fallback integer
+  //   const defaultCat = categories[0] && typeof categories[0] === 'object' 
+  //     ? categories[0].id 
+  //     : (categories[0] || '');
+
+  //   setEditingProduct(null);
+  //   setProductForm({
+  //     product_name: '',
+  //     category_id: defaultCat,
+  //     price: '',
+  //     description: '',
+  //     image_url: '🍄',
+  //     stockQuantity: '50'
+  //   });
+  //   setShowProductModal(true);
   // }; replace with the following
   const handleOpenAddProduct = () => {
     setEditingProduct(null);
@@ -37,6 +55,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
       price: '',
       description: '',
       default_image: null, // 👈 Reset to null on add
+      image_url: '🍄',
       stockQuantity: '50'
     });
     setShowProductModal(true);
@@ -57,6 +76,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
       price: product.price,
       description: product.description,
       default_image: null, // 👈 Null by default during edit unless a new file is chosen
+      image_url: product.image_url,
       stockQuantity: product.stock_quantity !== undefined && product.stock_quantity !== null 
         ? product.stock_quantity 
         : (product.stockQuantity !== undefined ? product.stockQuantity : 50)
@@ -108,6 +128,33 @@ export default function AdminData({ products, setProducts, categories, setCatego
       }
     } else {
       
+      // CREATE Product in database
+  //     try {
+  //       const res = await fetch('https://mm-api-virid.vercel.app/api/products', {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify(productPayload)
+  //       });
+  //       if (!res.ok) throw new Error('API save failed');
+  //       const created = await res.json();
+        
+  //       setProducts(prev => [created, ...prev]);
+  //       alert("Product has been added successfully");
+  //     } catch (err) {
+  //       console.warn("DB Create failed, falling back locally:", err.message);
+  //       const newProduct = {
+  //         id: Date.now(),
+  //         ...productForm,
+  //         price: parseFloat(productForm.price).toFixed(2),
+  //         stock_quantity: qty,
+  //         stockStatus: status
+  //       };
+  //       setProducts(prev => [newProduct, ...prev]);
+  //       alert("Product added locally (offline mode)");
+  //     }
+  //   }
+  //   setShowProductModal(false);
+  // };
   try {
         const res = await fetch('https://mm-api-virid.vercel.app/api/products', {
           method: 'POST',
@@ -169,6 +216,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
     // 💡 FIXED: Extract the raw ID if an object is passed, ensuring editingCategory is just the ID
     const catId = cat && typeof cat === 'object' ? cat.id : cat;
     setEditingCategory(catId);
+    // Support category structure as string or relational object properties safely
+    setEditingCategory(cat);
     setCategoryName(typeof cat === 'object' ? cat.category_name : cat);
     setShowCategoryModal(true);
   };
@@ -179,31 +228,22 @@ export default function AdminData({ products, setProducts, categories, setCatego
 
     const computedSlug = categoryName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
 
-    if (editingCategory) {
-      // ✅ UPDATE Category
+    if (editingCategory && typeof editingCategory === 'object') {
+      // UPDATE Category 
       try {
-        const res = await fetch(`https://mm-api-virid.vercel.app/api/categories/${editingCategory}`, {
+        const res = await fetch(`https://vercel.app{editingCategory.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            categoryName: categoryName, 
+            categoryName: categoryName, // ✅ Updated to camelCase
             slug: computedSlug
           })
         });
-        
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`API update failed: ${errText}`);
-        }
-        
+        if (!res.ok) throw new Error('API update failed');
         const updatedCat = await res.json();
-        
-        setCategories(prev => prev.map(c => (typeof c === 'object' ? c.id === editingCategory : c === editingCategory) ? updatedCat : c));
-        alert("Category updated successfully in database!");
+        setCategories(prev => prev.map(c => c.id === editingCategory.id ? updatedCat : c));
       } catch (err) {
-        console.error("Category update failed on DB:", err.message);
-        alert(`Could not update category: ${err.message}`);
-        return;
+        console.warn("Category update failed on DB, applying locally:", err.message);
       }
     } else {
       // ➕ CREATE Category
@@ -212,8 +252,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            categoryName: categoryName, 
-            slug: computedSlug         
+            categoryName: categoryName, // ✅ FIXED: Changed from category_name to categoryName
+            slug: computedSlug         // ✅ Passed the required url slug parameter
           })
         });
         
@@ -223,12 +263,15 @@ export default function AdminData({ products, setProducts, categories, setCatego
         }
         
         const newCategoryObj = await res.json();
+        
+        // Save the verified database response array directly
         setCategories(prev => [...prev, newCategoryObj]);
         setCategoryName(''); 
         alert("Category saved successfully to database!");
 
       } catch (err) {
         console.warn("Category storage hook rejected payload, saving fallback mock:", err.message);
+        // Fallback local code if network behaves unexpectedly
         setCategories(prev => [...prev, { id: Date.now(), category_name: categoryName }]);
       }
     }
@@ -240,35 +283,26 @@ export default function AdminData({ products, setProducts, categories, setCatego
   const handleDeleteCategory = async (catToDelete) => {
     const isObj = catToDelete && typeof catToDelete === 'object';
     const displayTitle = isObj ? catToDelete.category_name : catToDelete;
-    // 💡 FIXED: Safely extract the target ID number/string
-    const targetId = isObj ? catToDelete.id : catToDelete;
+    const targetId = isObj ? catToDelete.id : null;
 
     if (!window.confirm(`Delete category "${displayTitle}"? Products in this category will be unassigned.`)) return;
 
+    // ✅ FIXED: Added persistent DELETE route communication with backend server
     if (targetId) {
       try {
-        const res = await fetch(`https://mm-api-virid.vercel.app/api/categories/${targetId}`, {
+        const res = await fetch(`https://vercel.app{targetId}`, {
           method: 'DELETE'
         });
+        if (!res.ok) throw new Error('API delete category route failed');
         
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`API delete failed: ${errText}`);
-        }
-        
-        // Successfully deleted from database, now update state
-        setCategories(prev => prev.filter(c => (typeof c === 'object' ? c.id !== targetId : c !== targetId)));
+        setCategories(prev => prev.filter(c => c.id !== targetId));
         setProducts(prev => prev.map(p => {
-          const isTarget = typeof p.category_id === 'object' ? p.category_id?.id === targetId : p.category_id === targetId;
+          const isTarget = typeof p.category_id === 'object' ? p.category_id.id === targetId : p.category_id === targetId;
           return isTarget ? { ...p, category_id: 'Unassigned' } : p;
         }));
-        
-        alert("Category deleted successfully from database!");
         return;
       } catch (err) {
-        console.error("DB Category delete request failed:", err.message);
-        alert(`Could not delete from database: ${err.message}`);
-        return; 
+        console.warn("DB Category delete request failed, falling back locally:", err.message);
       }
     }
 
@@ -330,63 +364,48 @@ export default function AdminData({ products, setProducts, categories, setCatego
                     <td colSpan="5" style={{ textAlign: 'center', padding: '30px' }}>No products found in database.</td>
                   </tr>
                 ) : (
-                  products.map(product => {
-                    // 💡 FIXED: Resolve category name dynamically from categories list or object structure
-                    const resolvedCategoryName = (() => {
-                      if (product.category_id && typeof product.category_id === 'object') {
-                        return product.category_id.category_name || "Unassigned";
-                      }
-                      const matchedCat = categories.find(c => 
-                        (typeof c === 'object' && String(c.id) === String(product.category_id)) || 
-                        String(c) === String(product.category_id)
-                      );
-                      if (matchedCat) {
-                        return typeof matchedCat === 'object' ? matchedCat.category_name : matchedCat;
-                      }
-                      return product.category_name || "Unassigned";
-                    })();
-
-                    return (
-                      <tr key={product.id}>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '1.5rem' }}>{product.image_url}</span>
-                            <strong>{product.product_name}</strong>
+                  products.map(product => (
+                    <tr key={product.id}>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ fontSize: '1.5rem' }}>{product.image_url}</span>
+                          <strong>{product.product_name}</strong>
+                        </div>
+                      </td>
+                      {/* <td><span className="product-badge" style={{ position: 'static' }}>{product.category_id}</span></td>
+                      <td>
+                        {categories.find(c => String(c.id) === String(product.category_id))?.name || "Unassigned"}
+                      </td> */}
+                      {/* update category to display category name instead of cetegory id */}
+                      <td>
+                        <span className="product-badge" style={{ position: 'static' }}>
+                          {/* {categories.find(c => String(c.id) === String(product.category_id))?.name || "Unassigned"} */}
+                          {/* {product.category_id || "Unassigned"} // changing this again*/}
+                          {product.category_id && typeof product.category_id === 'object'
+                            ? product.category_id.category_name 
+                            : (product.category_id || "Unassigned")}
+                        </span>
+                      </td>
+                      <td><span className="product-price">${product.price}</span></td>
+                      <td>
+                        <span className={`stock-badge ${product.stockStatus === 'in' ? 'stock-in' : product.stockStatus === 'low' ? 'stock-low' : 'stock-out'}`}>
+                          {/* {product.stockStatus.toUpperCase()} changed this*/}
+                          {product.stockStatus ? product.stockStatus.toUpperCase() : 'UNKNOWN'}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                        {/* 2. WRAPPED buttons in a flex container div */}
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
+                          <button className="mario-btn mario-btn-yellow" style={{ padding: '6px 10px', fontSize: '0.55rem' }} onClick={() => handleOpenEditProduct(product)}>
+                            Edit
+                          </button>
+                          <button className="mario-btn mario-btn-red" style={{ padding: '6px 10px', fontSize: '0.55rem' }} onClick={() => handleDeleteProduct(product.id)}>
+                            Delete
+                          </button>
                           </div>
                         </td>
-                        {/* <td><span className="product-badge" style={{ position: 'static' }}>{product.category_id}</span></td>
-                        <td>
-                          {categories.find(c => String(c.id) === String(product.category_id))?.name || "Unassigned"}
-                        </td> */}
-                        {/* update category to display category name instead of cetegory id */}
-                        <td>
-                          <span className="product-badge" style={{ position: 'static' }}>
-                            {/* {categories.find(c => String(c.id) === String(product.category_id))?.name || "Unassigned"} */}
-                            {/* {product.category_id || "Unassigned"} // changing this again*/}
-                            {resolvedCategoryName}
-                          </span>
-                        </td>
-                        <td><span className="product-price">${product.price}</span></td>
-                        <td>
-                          <span className={`stock-badge ${product.stockStatus === 'in' ? 'stock-in' : product.stockStatus === 'low' ? 'stock-low' : 'stock-out'}`}>
-                            {/* {product.stockStatus.toUpperCase()} changed this*/}
-                            {product.stockStatus ? product.stockStatus.toUpperCase() : 'UNKNOWN'}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: 'center', verticalAlign: 'middle', height: '100%', padding: '0 12px' }}>
-                          {/* 2. WRAPPED buttons in a flex container div */}
-                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
-                            <button className="mario-btn mario-btn-yellow" style={{ padding: '6px 10px', fontSize: '0.55rem' }} onClick={() => handleOpenEditProduct(product)}>
-                              Edit
-                            </button>
-                            <button className="mario-btn mario-btn-red" style={{ padding: '6px 10px', fontSize: '0.55rem' }} onClick={() => handleDeleteProduct(product.id)}>
-                              Delete
-                            </button>
-                            </div>
-                          </td>
-                      </tr>
-                    );
-                  })
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
@@ -415,7 +434,22 @@ export default function AdminData({ products, setProducts, categories, setCatego
               </thead>
               <tbody>
                 {/* {categories.map((cat, index) => {
-                  */}
+                  const count = products.filter(p => p.category_id === cat).length;
+                  return (
+                    <tr key={index}>
+                      <td><strong>{cat}</strong></td>
+                      <td>{count} product(s)</td>
+                      <td style={{ textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                        <button className="mario-btn mario-btn-yellow" style={{ padding: '6px 10px', fontSize: '0.55rem' }} onClick={() => handleOpenEditCategory(cat)}>
+                          Edit
+                        </button>
+                        <button className="mario-btn mario-btn-red" style={{ padding: '6px 10px', fontSize: '0.55rem' }} onClick={() => handleDeleteCategory(cat)}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })} */}
                 {/* replace this block with below */}
                 {categories.map((cat, index) => {
                   // 1. Safely extract the display name and unique database matching properties
@@ -440,24 +474,21 @@ export default function AdminData({ products, setProducts, categories, setCatego
                       {/* ✅ FIXED: Renders the categoryLabel string instead of the raw object */}
                       <td><strong>{categoryLabel}</strong></td>
                       <td>{count} product(s)</td>
-                      <td style={{ textAlign: 'center', verticalAlign: 'middle', height: '100%', padding: '0 12px' }}>
-                        {/* 💡 FIXED: Uses an inner flex container matching the cell height cleanly */}
-                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '45px' }}>
-                          <button 
-                            className="mario-btn mario-btn-yellow" 
-                            style={{ padding: '6px 10px', fontSize: '0.55rem' }} 
-                            onClick={() => handleOpenEditCategory(cat)}
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            className="mario-btn mario-btn-red" 
-                            style={{ padding: '6px 10px', fontSize: '0.55rem' }} 
-                            onClick={() => handleDeleteCategory(cat)}
-                          >
-                            Delete
-                          </button>
-                        </div>
+                      <td style={{ textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                        <button 
+                          className="mario-btn mario-btn-yellow" 
+                          style={{ padding: '6px 10px', fontSize: '0.55rem' }} 
+                          onClick={() => handleOpenEditCategory(cat)}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className="mario-btn mario-btn-red" 
+                          style={{ padding: '6px 10px', fontSize: '0.55rem' }} 
+                          onClick={() => handleDeleteCategory(cat)}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   );

@@ -1,11 +1,13 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import ProductModal from '../components/ProductModal.jsx';
+
 
 // Categories mapping helper
-const CATEGORIES = {
+/* const CATEGORIES = {
   1: 'Power-ups',
   2: 'Items & Weapons',
   3: 'Outfits & Suits'
-};
+}; */
 
 // Column definitions for the PRODUCTS Table
 const DB_PRODUCTS_COLUMNS = [
@@ -121,13 +123,119 @@ const getProductStockQuantity = (productId) => {
 };
 
 function Products({ onAddToCart = () => {} }) {
+    const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [productlist, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [sortBy, setSortBy] = useState('name-asc');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState(null);
+
+  const categoryScrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+
+    // Fetch from database
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    setError(null);
+    console.log('inside fetchproduct');
+    console.log(productlist);
+    try {
+      const res = await fetch('https://mm-api-virid.vercel.app/api/product/list');
+      const data = await res.json();
+      console.log('inside try block');
+      console.log(data);
+      setProducts(data);
+    } catch (err) {
+      console.log('inside catch block');
+      console.error(err);
+      setError('Failed to fetch products');
+    } finally {
+      setLoading(false);
+          console.log(productlist);
+    }
+  };
+  
+// set the data to result
+useEffect(() => {
+  fetchProducts();
+}, []);
+
+
+  const checkScroll = useCallback(() => {
+    const el = categoryScrollRef.current;
+    if (el) {
+      const scrollLeft = el.scrollLeft;
+      const scrollWidth = el.scrollWidth;
+      const clientWidth = el.clientWidth;
+      setCanScrollLeft(scrollLeft > 1);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCategories = async () => {
+      setCategoriesLoading(true);
+      setCategoriesError(null);
+      try {
+        const res = await fetch('https://mm-api-virid.vercel.app/api/categories');
+        if (!res.ok) {
+          throw new Error(`Failed to fetch categories: ${res.status}`);
+        }
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data?.data || data?.categories || []);
+        if (isMounted) {
+          setCategories(list);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setCategoriesError(err.message || 'Failed to load categories');
+        }
+      } finally {
+        if (isMounted) {
+          setCategoriesLoading(false);
+        }
+      }
+    };
+
+    fetchCategories();
+    return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = categoryScrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', checkScroll);
+    }
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      if (el) {
+        el.removeEventListener('scroll', checkScroll);
+      }
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll, categories, categoriesLoading]);
+
+  const handleScroll = (direction) => {
+    const el = categoryScrollRef.current;
+    if (el) {
+      const amount = el.clientWidth * 0.75 || 200;
+      el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
+    }
+  };
+
   // Stock badge styling helper
   const getStockDetails = (qty) => {
+    /* console.log(qty); */
     if (qty === 0) {
       return { className: 'stock-out', label: 'OUT OF STOCK' };
     }
@@ -142,18 +250,25 @@ function Products({ onAddToCart = () => {} }) {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let result = [...MOCK_PRODUCTS];
-
+    let result = productlist;
+console.log('inside filtered products');
+console.log(result);
     // Category filter
     if (selectedCategory !== null) {
-      result = result.filter(p => p.category_id === selectedCategory);
+      result = result.filter(
+        (p) =>
+          p.category_id === selectedCategory ||
+          p.category_code === selectedCategory ||
+          String(p.category_id) === String(selectedCategory) ||
+          (p.category_code && String(p.category_code) === String(selectedCategory))
+      );
     }
 
     // Search query filter
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
       result = result.filter(p => 
-        p.name.toLowerCase().includes(q) || 
+        p.product_name.toLowerCase().includes(q) || 
         p.description.toLowerCase().includes(q)
       );
     }
@@ -162,13 +277,13 @@ function Products({ onAddToCart = () => {} }) {
     result.sort((a, b) => {
       switch (sortBy) {
         case 'price-asc':
-          return a.price - b.price;
+          return a.unit_price - b.unit_price;
         case 'price-desc':
-          return b.price - a.price;
+          return b.unit_price - a.unit_price;
         case 'name-asc':
-          return a.name.localeCompare(b.name);
+          return a.product_name.localeCompare(b.product_name);
         case 'name-desc':
-          return b.name.localeCompare(a.name);
+          return b.product_name.localeCompare(a.product_name);
         case 'date-desc':
           return new Date(b.created_at) - new Date(a.created_at);
         default:
@@ -177,7 +292,7 @@ function Products({ onAddToCart = () => {} }) {
     });
 
     return result;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [productlist, searchQuery, selectedCategory, sortBy]);
 
   const handleOpenModal = (product) => {
     setSelectedProduct(product);
@@ -232,31 +347,120 @@ function Products({ onAddToCart = () => {} }) {
           </select>
         </div>
 
-        <div className="category-filters">
-          <button
-            className={`category-btn ${selectedCategory === null ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(null)}
+        <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
+          {canScrollLeft && (
+            <button
+              type="button"
+              className="category-btn"
+              onClick={() => handleScroll('left')}
+              aria-label="Scroll Left"
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 5,
+                padding: '6px 10px',
+                minWidth: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'var(--mario-yellow)',
+                border: '2px solid var(--dark-text)',
+                borderRadius: '50%',
+                boxShadow: '0 3px 0 var(--dark-text)',
+                cursor: 'pointer',
+              }}
+            >
+              ◀
+            </button>
+          )}
+
+          <div
+            ref={categoryScrollRef}
+            className="category-filters"
+            style={{
+              display: 'flex',
+              overflowX: 'auto',
+              flexWrap: 'nowrap',
+              maxWidth: '100%',
+              paddingBottom: '8px',
+              gap: '12px',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              paddingLeft: canScrollLeft ? '40px' : '0px',
+              paddingRight: canScrollRight ? '40px' : '0px',
+              transition: 'padding 0.2s ease',
+            }}
           >
-            All Items
-          </button>
-          <button
-            className={`category-btn ${selectedCategory === 1 ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(1)}
-          >
-            Power-ups
-          </button>
-          <button
-            className={`category-btn ${selectedCategory === 2 ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(2)}
-          >
-            Items & Weapons
-          </button>
-          <button
-            className={`category-btn ${selectedCategory === 3 ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(3)}
-          >
-            Outfits & Suits
-          </button>
+            <button
+              type="button"
+              className={`category-btn ${selectedCategory === null ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(null)}
+              style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+            >
+              All Items
+            </button>
+
+            {categoriesLoading ? (
+              <span style={{ fontSize: '0.85rem', color: '#64748B', alignSelf: 'center', flexShrink: 0 }}>
+                Loading categories...
+              </span>
+            ) : categoriesError ? (
+              <span style={{ fontSize: '0.85rem', color: 'var(--mario-red)', alignSelf: 'center', flexShrink: 0 }}>
+                Failed to load categories
+              </span>
+            ) : (
+              categories.map((cat, idx) => {
+                const code = cat.code !== undefined ? cat.code : (cat.id !== undefined ? cat.id : cat.slug);
+                const label = cat.description || cat.category_name || cat.name || cat.label || String(code);
+                const isSelected = selectedCategory === code || String(selectedCategory) === String(code);
+
+                return (
+                  <button
+                    key={cat.id || cat.code || cat.slug || idx}
+                    type="button"
+                    className={`category-btn ${isSelected ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(code)}
+                    style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+                  >
+                    {label}
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {canScrollRight && (
+            <button
+              type="button"
+              className="category-btn"
+              onClick={() => handleScroll('right')}
+              aria-label="Scroll Right"
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 5,
+                padding: '6px 10px',
+                minWidth: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'var(--mario-yellow)',
+                border: '2px solid var(--dark-text)',
+                borderRadius: '50%',
+                boxShadow: '0 3px 0 var(--dark-text)',
+                cursor: 'pointer',
+              }}
+            >
+              ▶
+            </button>
+          )}
         </div>
       </div>
 
@@ -264,7 +468,7 @@ function Products({ onAddToCart = () => {} }) {
       <div className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map(product => {
-            const stockQty = getProductStockQuantity(product.id);
+            const stockQty = Number(product.stock_quantity)  //getProductStockQuantity(product.id);
             const stock = getStockDetails(stockQty);
             const isOutOfStock = stockQty === 0;
 
@@ -273,18 +477,18 @@ function Products({ onAddToCart = () => {} }) {
                 {/* Product Image Container */}
                 {/* Category Badge */}
                   <div className="product-badge">
-                    {CATEGORIES[product.category_id]}
+                    {product.category_id}
                   </div>
                 <div className="product-image-container">
                   
                   <div className="product-image-placeholder">
-                    {product.image_url}
+                    <img src={product.default_image} alt={product.name} />
                   </div>
                 </div>
                 
                 {/* Product Info */}
                 <div style={{ textAlign: 'left', marginBottom: '12px' }}>
-                  <div className="product-title">{product.name}</div>
+                  <div className="product-title">{product.product_name}</div>
                   <div style={{ marginBottom: '10px' }}>
                     <span className={`stock-badge ${stock.className}`}>
                       {stock.label}
@@ -296,7 +500,7 @@ function Products({ onAddToCart = () => {} }) {
                 {/* Product Footer (Price and Actions) */}
                 <div className="product-footer">
                   <div className="product-price">
-                    ${product.price.toFixed(2)}
+                    ${product.unit_price}
                   </div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     <button
@@ -331,131 +535,13 @@ function Products({ onAddToCart = () => {} }) {
         )}
       </div>
 
-      {/* Database Schema Details Modal */}
-      {selectedProduct && (() => {
-        const stockQty = getProductStockQuantity(selectedProduct.id);
-        const invRecord = getProductStockRecord(selectedProduct.id);
-        const stock = getStockDetails(stockQty);
-
-        return (
-          <div className="modal-overlay" onClick={handleCloseModal}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <button className="modal-close-btn" onClick={handleCloseModal}>
-                X
-              </button>
-              
-              <div className="modal-header-section">
-                <div className="modal-image">
-                  {selectedProduct.image_url}
-                </div>
-                <div className="modal-title-area">
-                  <h3 className="modal-title">{selectedProduct.name}</h3>
-                  <span className={`stock-badge ${stock.className}`}>
-                    {stock.label}
-                  </span>
-                </div>
-              </div>
-
-              {/* PRODUCTS Table details */}
-              <div className="db-table-title">
-                📁 PRODUCTS Table (Product Details Database)
-              </div>
-
-              <table className="db-details-table">
-                <thead>
-                  <tr>
-                    <th>Column Name</th>
-                    <th>Column Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {DB_PRODUCTS_COLUMNS.map(col => {
-                    let valDisplay = '';
-                    if (col.name === 'category_id') {
-                      valDisplay = `${selectedProduct.category_id} (${CATEGORIES[selectedProduct.category_id]})`;
-                    } else if (col.name === 'price') {
-                      valDisplay = `$${selectedProduct.price.toFixed(2)}`;
-                    } else if (col.name === 'created_at' || col.name === 'updated_at') {
-                      valDisplay = formatTimestamp(selectedProduct[col.name]);
-                    } else {
-                      valDisplay = String(selectedProduct[col.name]);
-                    }
-
-                    return (
-                      <tr key={col.name}>
-                        <th>
-                          <span className="db-column-name">{col.name}</span>
-                          <span className="db-type-badge">{col.type}</span>
-                          <div style={{ fontSize: '0.7rem', fontWeight: 'normal', color: '#64748B', marginTop: '4px', textTransform: 'none', fontFamily: 'var(--font-main)' }}>
-                            {col.label}
-                          </div>
-                        </th>
-                        <td>{valDisplay}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-
-              {/* INVENTORY Table details */}
-              <div className="db-table-title">
-                📁 INVENTORY Table (Separate Stock Level Database)
-              </div>
-
-              <table className="db-details-table">
-                <thead>
-                  <tr>
-                    <th>Column Name</th>
-                    <th>Column Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {DB_INVENTORY_COLUMNS.map(col => {
-                    let valDisplay = '';
-                    if (col.name === 'updated_at') {
-                      valDisplay = formatTimestamp(invRecord[col.name]);
-                    } else {
-                      valDisplay = String(invRecord[col.name]);
-                    }
-
-                    return (
-                      <tr key={col.name}>
-                        <th>
-                          <span className="db-column-name">{col.name}</span>
-                          <span className="db-type-badge">{col.type}</span>
-                          <div style={{ fontSize: '0.7rem', fontWeight: 'normal', color: '#64748B', marginTop: '4px', textTransform: 'none', fontFamily: 'var(--font-main)' }}>
-                            {col.label}
-                          </div>
-                        </th>
-                        <td>{valDisplay}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
-                <button 
-                  className="mario-btn mario-btn-green"
-                  onClick={() => {
-                    if (stockQty > 0) {
-                      onAddToCart(selectedProduct);
-                      handleCloseModal();
-                    }
-                  }}
-                  disabled={stockQty === 0}
-                  style={{ opacity: stockQty === 0 ? 0.6 : 1 }}
-                >
-                  Add To Cart
-                </button>
-                <button className="mario-btn mario-btn-red" onClick={handleCloseModal}>
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {/* Product Details Modal */}
+      {selectedProduct && (
+        <ProductModal 
+          product={selectedProduct}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }
