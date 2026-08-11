@@ -5,7 +5,6 @@ import logoSrc from '../assets/mm_logo/mariomart_logo.jpg';
 
 export default function Navbar({ onSwitchView }) {
   const { user, role, isAuthenticated, logout } = useAuth();
-
   const navigate = useNavigate();
 
   // Which dropdown is open: null | 'profile' | 'admin' | 'sales'
