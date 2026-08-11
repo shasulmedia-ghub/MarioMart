@@ -1,181 +1,65 @@
-/* eslint-disable react-refresh/only-export-components */
-
-import {
-    createContext,
-    useContext,
-    useState,
-    useEffect,
-} from "react";
-
-import storage from "../utils/storage";
-import authService from "../services/authService";
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext(null);
 
+const TOKEN_KEY = 'mm_token';
+const USER_KEY  = 'mm_user';
+
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [token, setToken]   = useState(() => localStorage.getItem(TOKEN_KEY));
+  const [user,  setUser]    = useState(() => {
+    try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch { return null; }
+  });
 
-    // --------------------------------------------------
-    // CHECK EXISTING LOGIN
-    // --------------------------------------------------
+  // Derive role from JWT payload
+  const role = (() => {
+    if (!token) return null;
+    try {
+      const decoded = jwtDecode(token);
+      return decoded.role ?? decoded.userRole ?? decoded.user_role ?? null;
+    } catch {
+      return null;
+    }
+  })();
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const token = storage.getToken();
-                const storedUser = storage.getUser();
+  const isAuthenticated = Boolean(token && user);
 
-                console.log(
-                    "Stored token:",
-                    token
-                );
+  // Persist / clear on changes
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    }
+  }, [token]);
 
-                console.log(
-                    "Stored user:",
-                    storedUser
-                );
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
+  }, [user]);
 
-                // No token means user is not logged in
-                if (!token) {
-                    setUser(null);
-                    return;
-                }
+  const login = useCallback((newToken, userData) => {
+    setToken(newToken);
+    setUser(userData);
+  }, []);
 
-                // Restore stored user immediately
-                if (storedUser) {
-                    setUser(storedUser);
-                }
+  const logout = useCallback(() => {
+    setToken(null);
+    setUser(null);
+  }, []);
 
-                // Verify token with backend
-                const response =
-                    await authService.profile();
-
-                console.log(
-                    "Profile response:",
-                    response
-                );
-
-                const updatedUser =
-                    response?.data?.user ||
-                    response?.user ||
-                    response?.data;
-
-                if (updatedUser) {
-                    setUser(updatedUser);
-                    storage.saveUser(updatedUser);
-                }
-
-            } catch (err) {
-                console.error(
-                    "Token verification failed:",
-                    err
-                );
-
-                storage.clearAuth();
-                setUser(null);
-
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        checkAuth();
-    }, []);
-
-    // --------------------------------------------------
-    // LOGIN
-    // --------------------------------------------------
-
-    const login = (userData, token) => {
-
-        console.log(
-            "AuthContext login()"
-        );
-
-        console.log(
-            "User:",
-            userData
-        );
-
-        console.log(
-            "Token:",
-            token
-        );
-
-        if (!token) {
-            console.error(
-                "Login failed: No authentication token received."
-            );
-
-            return false;
-        }
-
-        if (!userData) {
-            console.error(
-                "Login failed: No user data received."
-            );
-
-            return false;
-        }
-
-        // Save authentication information
-        storage.saveToken(token);
-        storage.saveUser(userData);
-
-        // Update React authentication state
-        setUser(userData);
-
-        console.log(
-            "Authentication state updated."
-        );
-
-        return true;
-    };
-
-    // --------------------------------------------------
-    // LOGOUT
-    // --------------------------------------------------
-
-    const logout = () => {
-        console.log(
-            "Logging out..."
-        );
-
-        storage.clearAuth();
-
-        setUser(null);
-    };
-
-    // --------------------------------------------------
-    // AUTHENTICATION STATUS
-    // --------------------------------------------------
-
-    const isAuthenticated =
-        !!user;
-
-    const value = {
-        user,
-        isAuthenticated,
-        loading,
-        login,
-        logout,
-    };
-
-    return (
-        <AuthContext.Provider
-            value={value}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
+  return (
+    <AuthContext.Provider value={{ token, user, role, isAuthenticated, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-// --------------------------------------------------
-// USE AUTH HOOK
-// --------------------------------------------------
-
-export const useAuth = () =>
-    useContext(AuthContext);
-
-export default AuthContext;
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
+  return ctx;
+}
