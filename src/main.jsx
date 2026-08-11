@@ -6,7 +6,7 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 import App from './App.jsx'
-import Login from './pages/Login.jsx'
+import Login from './pages/register.jsx'
 import Register from './pages/Register.jsx'
 import AdminDashboard from './component/AdminDashboard.jsx'
 import ProductDetails from './component/ProductDetails.jsx'
