@@ -10,7 +10,11 @@ export default function AdminData({ products, setProducts, categories, setCatego
     category_id: '',
     description: '',
     default_image: null, // 👈 Holds the actual file object selected by the admin
-    stockQuantity: 50
+    unit_price: '',          // 👈 Variant Unit Price
+    stock_quantity: '50',    // 👈 Variant Stock Quantity
+    size: '',                // 👈 Optional Variant Size
+    colour: '',              // 👈 Optional Variant Colour
+    field: ''                // 👈 Optional Variant Field
   });
 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -34,10 +38,13 @@ export default function AdminData({ products, setProducts, categories, setCatego
     setProductForm({
       product_name: '',
       category_id: defaultCategoryId, // 👈 Guaranteed to be a defined string or ID number
-      price: '',
+      unit_price: '',
       description: '',
       default_image: null, // 👈 Reset to null on add
-      stockQuantity: '50'
+      stock_quantity: '50',
+      size: '',
+      colour: '',
+      field: ''
     });
     setShowProductModal(true);
   };
@@ -51,15 +58,24 @@ export default function AdminData({ products, setProducts, categories, setCatego
       ? product.category_id.id
       : product.category_id;
 
+      const resolvedPrice = product.price !== undefined && product.price !== null 
+      ? product.price 
+      : (product.unit_price !== undefined && product.unit_price !== null 
+          ? product.unit_price 
+          : (product.unit_price !== undefined && product.unit_price !== null ? product.unit_price : ''));
+
     setProductForm({
       product_name: product.product_name,
       category_id: currentCategoryId || '',
-      price: product.price,
+      unit_price: resolvedPrice, // 👈 Ensures current price is populated
       description: product.description,
       default_image: null, // 👈 Null by default during edit unless a new file is chosen
-      stockQuantity: product.stock_quantity !== undefined && product.stock_quantity !== null 
+      stock_quantity: product.stock_quantity !== undefined && product.stock_quantity !== null 
         ? product.stock_quantity 
-        : (product.stockQuantity !== undefined ? product.stockQuantity : 50)
+        : (product.stock_quantity !== undefined ? product.stock_quantity : 50),
+      size: product.size || '',
+      colour: product.colour || '',
+      field: product.field || ''
     });
     setShowProductModal(true);
   };
@@ -67,20 +83,32 @@ export default function AdminData({ products, setProducts, categories, setCatego
   const handleSaveProduct = async (e) => {
     e.preventDefault();
     
-    const qty = parseInt(productForm.stockQuantity) || 0;
+    const qty = parseInt(productForm.stock_quantity) || 0;
     let status = 'in';
     if (qty <= 0) status = 'out';
     else if (qty <= 10) status = 'low';
 
+    // 💡 Auto-generate alphanumeric filename if a new file was uploaded
+    let finalDefaultImageUrl = productForm.default_image;
+    if (productForm.default_image && typeof productForm.default_image === 'object') {
+      const fileExtension = productForm.default_image.name.split('.').pop() || 'jpg';
+      const randomAlphanumeric = Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+      finalDefaultImageUrl = `/assets/products/${randomAlphanumeric}.${fileExtension}`;
+    }
+
     // ✅ FIXED: Corrected category_id pointer assignment typo
+    // ✅ Match backend database variant schema requirements
     const productPayload = {
       product_name: productForm.product_name,
-      price: parseFloat(productForm.price),
       description: productForm.description,
-      image_url: productForm.image_url,
+      default_image: finalDefaultImageUrl, // 👈 Uses the newly generated auto filename path
       category_id: productForm.category_id, 
+      unit_price: parseFloat(productForm.unit_price) || 0,
       stock_quantity: qty,
-      stockStatus: status
+      stock_status: status,
+      size: productForm.size || '',
+      colour: productForm.colour || '',
+      field: productForm.field || ''
     };
 
     if (editingProduct) {
@@ -91,7 +119,11 @@ export default function AdminData({ products, setProducts, categories, setCatego
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(productPayload)
         });
-        if (!res.ok) throw new Error('API update failed');
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`API update failed: ${errorText}`);
+        }
+
         const updatedFromServer = await res.json();
         
         setProducts(prev => prev.map(p => p.id === editingProduct ? updatedFromServer : p));
@@ -101,9 +133,10 @@ export default function AdminData({ products, setProducts, categories, setCatego
         setProducts(prev => prev.map(p => p.id === editingProduct ? { 
           ...p, 
           ...productForm, 
-          price: parseFloat(productForm.price).toFixed(2),
+          default_image: finalDefaultImageUrl,
+          unit_price: parseFloat(productForm.unit_price).toFixed(2),
           stock_quantity: qty,
-          stockStatus: status
+          stock_status: status
         } : p));
       }
     } else {
@@ -132,9 +165,10 @@ export default function AdminData({ products, setProducts, categories, setCatego
         const newProduct = {
           id: Date.now(),
           ...productForm,
-          price: parseFloat(productForm.price).toFixed(2),
+          default_image: finalDefaultImageUrl,
+          unit_price: parseFloat(productForm.unit_price).toFixed(2),
           stock_quantity: qty,
-          stockStatus: status
+          stock_status: status
         };
         setProducts(prev => [newProduct, ...prev]);
         alert("Product added locally (offline mode)");
@@ -317,7 +351,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
             <table className="db-details-table" style={{ margin: 0, border: 'none' }}>
               <thead>
                 <tr>
-                  <th>Icon & Title</th>
+                  <th>Image & Title</th>
                   <th>Category</th>
                   <th>Price</th>
                   <th>Stock</th>
@@ -333,13 +367,33 @@ export default function AdminData({ products, setProducts, categories, setCatego
                   products.map(product => {
                     // 💡 FIXED: Resolve category name dynamically from categories list or object structure
                     const resolvedCategoryName = (() => {
+                      // if (product.category_id && typeof product.category_id === 'object') {
+                      //   return product.category_id.category_name || "Unassigned";
+                      // }
+                      // const matchedCat = categories.find(c => 
+                      //   (typeof c === 'object' && String(c.id) === String(product.category_id)) || 
+                      //   String(c) === String(product.category_id)
+                      // );
+                      // if (matchedCat) {
+                      //   return typeof matchedCat === 'object' ? matchedCat.category_name : matchedCat;
+                      // }
+                      // replace with following
+                      // 1. If the joined backend query already provided category_name, use it immediately!
+                      if (product.category_name) {
+                        return product.category_name;
+                      }
+                      
+                      // 2. If category_id is populated as a nested object
                       if (product.category_id && typeof product.category_id === 'object') {
                         return product.category_id.category_name || "Unassigned";
                       }
+                      
+                      // 3. Otherwise, search through your categories state array by ID
                       const matchedCat = categories.find(c => 
                         (typeof c === 'object' && String(c.id) === String(product.category_id)) || 
                         String(c) === String(product.category_id)
                       );
+                      
                       if (matchedCat) {
                         return typeof matchedCat === 'object' ? matchedCat.category_name : matchedCat;
                       }
@@ -348,17 +402,40 @@ export default function AdminData({ products, setProducts, categories, setCatego
 
                     return (
                       <tr key={product.id}>
-                        <td>
+                        {/* <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '1.5rem' }}>{product.image_url}</span>
+                            <span style={{ fontSize: '1.5rem' }}>{product.default_image}</span>
                             <strong>{product.product_name}</strong>
                           </div>
+                        </td> */}
+                        {/* replace with following to display product default image */}
+                        <td style={{ padding: '12px', verticalAlign: 'middle' }}>
+                          {product.default_image ? (
+                            <img 
+                              src={product.default_image.startsWith('http') || product.default_image.startsWith('/') 
+                                ? product.default_image 
+                                : `/uploads/products/${product.default_image}`} 
+                              alt={product.product_name || 'Product Image'} 
+                              style={{ 
+                                maxWidth: '300px', 
+                                maxHeight: '400px', 
+                                width: 'auto', 
+                                height: 'auto', 
+                                objectFit: 'contain',
+                                borderRadius: '4px',
+                                display: 'block'
+                              }} 
+                            />
+                          ) : (
+                            <span style={{ color: '#888', fontStyle: 'italic' }}>No Image</span>
+                          )}
                         </td>
                         {/* <td><span className="product-badge" style={{ position: 'static' }}>{product.category_id}</span></td>
                         <td>
                           {categories.find(c => String(c.id) === String(product.category_id))?.name || "Unassigned"}
                         </td> */}
                         {/* update category to display category name instead of cetegory id */}
+                        {/* to check on the font size of the product details in the table */}
                         <td>
                           <span className="product-badge" style={{ position: 'static' }}>
                             {/* {categories.find(c => String(c.id) === String(product.category_id))?.name || "Unassigned"} */}
@@ -366,11 +443,14 @@ export default function AdminData({ products, setProducts, categories, setCatego
                             {resolvedCategoryName}
                           </span>
                         </td>
-                        <td><span className="product-price">${product.price}</span></td>
                         <td>
-                          <span className={`stock-badge ${product.stockStatus === 'in' ? 'stock-in' : product.stockStatus === 'low' ? 'stock-low' : 'stock-out'}`}>
-                            {/* {product.stockStatus.toUpperCase()} changed this*/}
-                            {product.stockStatus ? product.stockStatus.toUpperCase() : 'UNKNOWN'}
+                          <span className="product-price" style={{ fontSize: '0.7rem' }}>
+                            ${product.price !== undefined && product.price !== null ? product.price : (product.unit_price || '0.00')}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`stock-badge ${product.stock_status === 'in' ? 'stock-in' : product.stock_status === 'low' ? 'stock-low' : 'stock-out'}`} style={{ fontSize: '0.7rem' }}>
+                            {product.stock_status ? product.stock_status.toUpperCase() : 'UNKNOWN'}
                           </span>
                         </td>
                         <td style={{ textAlign: 'center', verticalAlign: 'middle', height: '100%', padding: '0 12px' }}>
@@ -496,19 +576,40 @@ export default function AdminData({ products, setProducts, categories, setCatego
                     step="0.01"
                     min="0" 
                     required
-                    value={productForm.price} 
-                    onChange={e => setProductForm({ ...productForm, price: e.target.value })}
+                    value={productForm.unit_price}
+                    onChange={e => setProductForm({ ...productForm, unit_price: e.target.value })}
                     className="search-input" 
                     placeholder="19.99" 
                   />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Icon (Emoji):</label>
+                {/* <div style={{ flex: 1 }}>
+                  <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Upload Product Image</label>
                   <input 
                     type="text" 
                     required
-                    value={productForm.image_url} 
-                    onChange={e => setProductForm({ ...productForm, image_url: e.target.value })}
+                    value={productForm.default_image} 
+                    onChange={e => setProductForm({ ...productForm, default_image: e.target.value })}
+                    className="search-input" 
+                  />
+                </div> */}
+                {/* replace Icon Emoji with upload product image */}
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Upload Product Image (jpeg/png)</label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={e => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        // Store file object for upload and simulated folder path string for display/payload
+                        const folderPath = `/assets/products/${file.name}`;
+                        setProductForm({ 
+                          ...productForm, 
+                          default_image: file,
+                          default_image: folderPath 
+                        });
+                      }
+                    }}
                     className="search-input" 
                   />
                 </div>
@@ -546,12 +647,47 @@ export default function AdminData({ products, setProducts, categories, setCatego
                     step="1" 
                     min="0"
                     required
-                    value={productForm.stockQuantity} 
-                    onChange={e => setProductForm({ ...productForm, stockQuantity: e.target.value })}
+                    value={productForm.stock_quantity} 
+                    onChange={e => setProductForm({ ...productForm, stock_quantity: e.target.value })}
                     className="search-input" 
                     placeholder="10" 
                   />
                 </div>
+              </div>
+              {/* ==================== VARIANT FIELDS (Size, Colour, New Arrival) ==================== */}
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Size:</label>
+                  <input 
+                    type="text" 
+                    value={productForm.size || ''} 
+                    onChange={e => setProductForm({ ...productForm, size: e.target.value })}
+                    className="search-input" 
+                    placeholder="e.g. M, L, 42" 
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Colour:</label>
+                  <input 
+                    type="text" 
+                    value={productForm.colour || ''} 
+                    onChange={e => setProductForm({ ...productForm, colour: e.target.value })}
+                    className="search-input" 
+                    placeholder="e.g. Red, Blue" 
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input 
+                  type="checkbox" 
+                  id="new_arrival_checkbox"
+                  checked={!!productForm.new_arrival} 
+                  onChange={e => setProductForm({ ...productForm, new_arrival: e.target.checked })}
+                />
+                <label htmlFor="new_arrival_checkbox" style={{ fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' }}>
+                  Mark as New Arrival
+                </label>
               </div>
 
               <div>
