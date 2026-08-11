@@ -6,8 +6,10 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 import App from './App.jsx'
-import Login from './pages/register.jsx'
+import Login from './pages/login.jsx'
 import Register from './pages/Register.jsx'
+import UpdateProfile from './components/UpdateProfile.jsx'
+import ProfilePWChange from './components/ProfilePWChange.jsx'
 import AdminDashboard from './component/AdminDashboard.jsx'
 import ProductDetails from './component/ProductDetails.jsx'
 
@@ -20,6 +22,8 @@ createRoot(document.getElementById('root')).render(
           <Route path="/"         element={<App />} />
           <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<UpdateProfile />} />
+<Route path="/profile/password" element={<ProfilePWChange />} />
 
           {/* ── Protected routes ── */}
           <Route path="/cart"    element={<ProtectedRoute><App /></ProtectedRoute>} />

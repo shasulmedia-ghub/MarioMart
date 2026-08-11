@@ -14,7 +14,9 @@ app.use(express.json());
 // Users
 app.post("/api/users/register", users.registerUser);
 app.post("/api/users/login", users.loginUser);
+app.get("/api/users/:id", users.getUser);
 app.put("/api/users/:id", users.updateUser);
+app.put("/api/users/:id/password", users.changePassword);
 app.delete("/api/users/:id", users.deleteUser);
 
 // Cart

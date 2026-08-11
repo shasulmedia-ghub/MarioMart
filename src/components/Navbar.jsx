@@ -7,6 +7,13 @@ export default function Navbar({ onSwitchView }) {
   const { user, role, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
+console.log('=== NAVBAR AUTH DEBUG ===');
+console.log('user:', user);
+console.log('role:', role);
+console.log('isAuthenticated:', isAuthenticated);
+console.log('token:', localStorage.getItem('mm_token'));
+console.log('=========================');
+
   // Which dropdown is open: null | 'profile' | 'admin' | 'sales'
   const [openMenu, setOpenMenu] = useState(null);
   const navRef = useRef(null);
@@ -174,6 +181,7 @@ function ProfileDropdown({ openMenu, toggle, close, handleLogout }) {
         <DropdownMenu
           items={[
             { label: 'Update Profile', to: '/profile' },
+            { label: 'Update Password', to: '/profile/password' },
             { label: 'Logout', onClick: handleLogout },
           ]}
           onClose={close}
