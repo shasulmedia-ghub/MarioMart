@@ -8,10 +8,10 @@ const getUserByEmail = async (email) => {
     return result.rows[0];
 };
 
-const createUser = async (user) => {
+const createUser = async (users) => {
     const {
-        first_name,
-        last_name,
+        firstName,
+        lastName,
         email,
         password_hash,
         gender,
@@ -23,8 +23,8 @@ const createUser = async (user) => {
     const result = await pool.query(
         `INSERT INTO users
         (
-            first_name,
-            last_name,
+            firstName,
+            lastName,
             email,
             password_hash,
             gender,
@@ -46,8 +46,8 @@ const createUser = async (user) => {
 
         RETURNING
             id,
-            first_name,
-            last_name,
+            firstName,
+            lastName,
             email,
             gender,
             date_of_birth,
@@ -56,8 +56,8 @@ const createUser = async (user) => {
             created_at;`,
 
         [
-            first_name,
-            last_name,
+            firstName,
+            lastName,
             email,
             password_hash,
             gender || null,
@@ -65,7 +65,6 @@ const createUser = async (user) => {
             address || null,
             marketing_opt_in || false
         ]
-
     );
 
     return result.rows[0];
@@ -74,7 +73,7 @@ const createUser = async (user) => {
 
 const getUserById = async (id) => {
     const result = await pool.query(
-        "SELECT id, first_name, last_name, email, role, gender, date_of_birth, address, marketing_opt_in, created_at FROM users WHERE id=$1",
+        "SELECT id, firstName, lastName, email, role, gender, date_of_birth, address, marketing_opt_in, created_at FROM users WHERE id=$1",
         [id]
     );
     return result.rows[0];

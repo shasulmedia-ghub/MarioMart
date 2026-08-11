@@ -8,10 +8,9 @@ const SALT_ROUNDS = 10;
 const register = async (req, res, next) => {
 
     try {
-
         const {
-            first_name,
-            last_name,
+            firstName,
+            lastName,
             email,
             password,
             gender,
@@ -25,8 +24,8 @@ const register = async (req, res, next) => {
         ========================== */
 
         if (
-            !first_name ||
-            !last_name ||
+            !firstName ||
+            !lastName ||
             !email ||
             !password
         ) {
@@ -77,16 +76,14 @@ const register = async (req, res, next) => {
 
         const newUser =
             await userDB.createUser({
-
-                first_name,
-                last_name,
+                firstName,
+                lastName,
                 email,
                 password_hash,
                 gender,
                 date_of_birth,
                 address,
                 marketing_opt_in,
-
             });
 
         return success(

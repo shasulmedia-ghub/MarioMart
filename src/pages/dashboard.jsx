@@ -19,13 +19,15 @@ function Dashboard() {
     navigate("/", { replace: true });
   };
 
+  console.log("Dashboard user object state:", user);
+
     return (
         <Layout>
 
                 <PageHeader 
                 title="Welcome Back"
                 // subtitle={` ${user.firstName} ${user.lastName} `}/>
-                subtitle={` ${user.firstName} ${user.lastName} `}/>
+                subtitle={` ${user?.firstName ?? ''} ${user?.lastName ?? ''} `}/>
 
             <div
                 className="container py-5"
