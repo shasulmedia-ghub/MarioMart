@@ -367,17 +367,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
                   products.map(product => {
                     // 💡 FIXED: Resolve category name dynamically from categories list or object structure
                     const resolvedCategoryName = (() => {
-                      // if (product.category_id && typeof product.category_id === 'object') {
-                      //   return product.category_id.category_name || "Unassigned";
-                      // }
-                      // const matchedCat = categories.find(c => 
-                      //   (typeof c === 'object' && String(c.id) === String(product.category_id)) || 
-                      //   String(c) === String(product.category_id)
-                      // );
-                      // if (matchedCat) {
-                      //   return typeof matchedCat === 'object' ? matchedCat.category_name : matchedCat;
-                      // }
-                      // replace with following
                       // 1. If the joined backend query already provided category_name, use it immediately!
                       if (product.category_name) {
                         return product.category_name;
@@ -402,13 +391,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
 
                     return (
                       <tr key={product.id}>
-                        {/* <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '1.5rem' }}>{product.default_image}</span>
-                            <strong>{product.product_name}</strong>
-                          </div>
-                        </td> */}
-                        {/* replace with following to display product default image */}
                         <td style={{ padding: '12px', verticalAlign: 'middle' }}>
                           {product.default_image ? (
                             <img 
@@ -430,16 +412,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
                             <span style={{ color: '#888', fontStyle: 'italic' }}>No Image</span>
                           )}
                         </td>
-                        {/* <td><span className="product-badge" style={{ position: 'static' }}>{product.category_id}</span></td>
-                        <td>
-                          {categories.find(c => String(c.id) === String(product.category_id))?.name || "Unassigned"}
-                        </td> */}
-                        {/* update category to display category name instead of cetegory id */}
-                        {/* to check on the font size of the product details in the table */}
                         <td>
                           <span className="product-badge" style={{ position: 'static' }}>
-                            {/* {categories.find(c => String(c.id) === String(product.category_id))?.name || "Unassigned"} */}
-                            {/* {product.category_id || "Unassigned"} // changing this again*/}
                             {resolvedCategoryName}
                           </span>
                         </td>
@@ -582,17 +556,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
                     placeholder="19.99" 
                   />
                 </div>
-                {/* <div style={{ flex: 1 }}>
-                  <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Upload Product Image</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={productForm.default_image} 
-                    onChange={e => setProductForm({ ...productForm, default_image: e.target.value })}
-                    className="search-input" 
-                  />
-                </div> */}
-                {/* replace Icon Emoji with upload product image */}
                 <div style={{ flex: 1 }}>
                   <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Upload Product Image (jpeg/png)</label>
                   <input 
@@ -624,9 +587,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
                     className="sort-select"
                     style={{ width: '100%' }}
                   >
-                    {/* {categories.map((cat, i) => (
-                      <option key={i} value={cat}>{cat}</option>
-                    ))} */}
                     {categories.map((cat, i) => {
                       // Extract values using the exact keys from your API: id and category_name
                       const categoryValue = typeof cat === 'object' ? (cat.category_name || cat.id) : cat;
