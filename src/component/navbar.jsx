@@ -5,8 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import ROUTES from "../constants/routes";
 import "../App.css";
 
-
-
 function Navbar() {
 
   const navigate = useNavigate();
