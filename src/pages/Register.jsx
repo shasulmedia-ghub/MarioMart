@@ -83,6 +83,7 @@ export default function Register() {
           lastName:  form.lastName.trim(),
           email:     form.email.trim(),
           password:  form.password,
+          role: 'customer',
           dateOfBirth: form.dateOfBirth,
           gender:    form.gender,
           address:   form.address.trim(),

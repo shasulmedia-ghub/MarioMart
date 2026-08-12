@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-  import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 
 /* ============================================================
    Checkout Page
@@ -286,7 +287,13 @@ const CardPaymentPanel = ({ errors, cardData, onCardChange }) => {
 };
 
 // --------------- Main Checkout Component ---------------
-const Checkout = ({ checkoutItems = [], totalAmount = 0, onBackToCart, onPaymentSuccess }) => {
+const Checkout = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { fetchCartCount } = useOutletContext() || {};
+  
+  const checkoutItems = location.state?.items || [];
+  const totalAmount = location.state?.subtotal || 0;
 
   const [paymentMode, setPaymentMode]   = useState(null); // null | 'paynow' | 'card'
   const [cardData, setCardData]         = useState({ number: '', name: '', expiry: '', cvv: '' });
@@ -400,7 +407,7 @@ const response = await fetch(`https://mm-api-virid.vercel.app/api/orders`, {
     // Simulate payment processing delay then remove purchased items from cart
     await new Promise((resolve) => setTimeout(resolve, 1800));
     //await deleteCartItems(items);
-    if (onPaymentSuccess) onPaymentSuccess();
+    if (fetchCartCount) fetchCartCount();
     setIsProcessing(false);
     setPaymentSuccess(true);
   };
@@ -428,7 +435,7 @@ const response = await fetch(`https://mm-api-virid.vercel.app/api/orders`, {
             Payment via {paymentMode === 'paynow' ? 'PayNow' : 'Credit / Debit Card'}
           </div>
         </div>
-        <button className="mario-btn mario-btn-green" onClick={() => window.location.reload()}>
+        <button className="mario-btn mario-btn-green" onClick={() => navigate('/')}>
           Back to Shop 🏁
         </button>
       </div>
@@ -657,7 +664,7 @@ const response = await fetch(`https://mm-api-virid.vercel.app/api/orders`, {
           id="btn-back-to-cart"
           className="mario-btn mario-btn-yellow"
           type="button"
-          onClick={onBackToCart || (() => window.history.back())}
+          onClick={() => navigate('/cart')}
           disabled={isProcessing}
           style={{ fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}
         >

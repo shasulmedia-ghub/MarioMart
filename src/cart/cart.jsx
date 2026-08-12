@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 //import { MOCK_PRODUCTS, getProductStockQuantity } from '../component/Products.jsx';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-function Cart({ onSwitchView }) {
+function Cart() {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
@@ -195,7 +197,7 @@ function Cart({ onSwitchView }) {
       return;
     }
     //alert(`Mamma Mia! Proceeding to checkout for ${selectedItems.length} item(s) totaling $${subtotal.toFixed(2)}! ⭐️`);
-    onSwitchView('checkout', { items: selectedItems, subtotal });
+    navigate('/checkout', { state: { items: selectedItems, subtotal } });
   };
 
   return (
@@ -209,7 +211,7 @@ function Cart({ onSwitchView }) {
       {/* Back to Shop Navigation */}
       <button 
         className="mario-btn mario-btn-yellow" 
-        onClick={() => onSwitchView('shop')}
+        onClick={() => navigate('/')}
         style={{ marginBottom: '24px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}
       >
         ← Back to Shop
@@ -255,7 +257,7 @@ function Cart({ onSwitchView }) {
           <p style={{ color: '#64748B', maxWidth: '400px', margin: '0 auto 20px' }}>
             Looks like you haven't collected any power-ups yet. Jump back into the shop and grab some items!
           </p>
-          <button className="mario-btn mario-btn-green" onClick={onSwitchView}>
+          <button className="mario-btn mario-btn-green" onClick={() => navigate('/')}>
             Start Shopping 🪙
           </button>
         </div>
@@ -421,7 +423,7 @@ function Cart({ onSwitchView }) {
                       </button>
                     </div>
                     <span style={{ fontSize: '0.65rem', color: 'var(--mario-red)', marginTop: '4px', textAlign: 'center' }}>
-                      Max Order: {item.availableQty}
+                      Available Qty: {item.availableQty}
                     </span>
                   </div>
 
@@ -507,7 +509,7 @@ function Cart({ onSwitchView }) {
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
               <button 
                 className="mario-btn mario-btn-yellow" 
-                onClick={() => onSwitchView('shop')}
+                onClick={() => navigate('/')}
                 style={{ fontSize: '0.85rem' }}
               >
                 Continue Shopping

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logoSrc from '../assets/mm_logo/mariomart_logo.jpg';
 
-export default function Navbar({ onSwitchView }) {
+export default function Navbar() {
   const { user, role, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -79,7 +79,6 @@ export default function Navbar({ onSwitchView }) {
               className="cart-button"
               onClick={() => {
                 close();
-                if (onSwitchView) onSwitchView('cart');
               }}
               style={{ textDecoration: 'none' }}
               aria-label="View shopping cart"
@@ -91,7 +90,6 @@ export default function Navbar({ onSwitchView }) {
               className="mario-nav-link"
               onClick={() => {
                 close();
-                if (onSwitchView) onSwitchView('orders');
               }}
               style={{ textDecoration: 'none' }}
             >

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
 import './App.css';
 import Products from './component/Products.jsx';
 import ProductsData from './component/ProductsData.jsx';
@@ -14,17 +15,7 @@ import Footer from './components/Footer.jsx';
 import ProductModal from './components/ProductModal.jsx';
 
 function App() {
-  const [view, setView] = useState('shop'); // 'shop' | 'cart' | 'checkout' | 'orders'
   const [cartCount, setCartCount] = useState(0);
-  const [checkoutData, setCheckoutData] = useState({ items: [], subtotal: 0 });
-
-  // Central navigation handler — Cart passes ('checkout', payload) or ('shop')
-  const handleSwitchView = (targetView, payload = {}) => {
-    if (targetView === 'checkout' && payload.items) {
-      setCheckoutData({ items: payload.items, subtotal: payload.subtotal || 0 });
-    }
-    setView(targetView);
-  };
 
   const fetchCartCount = async () => {
     try {
@@ -58,29 +49,17 @@ function App() {
       
 
   useEffect(() => {
-    fetchCartCount();
-  }, [view]);
+    //fetchCartCount();
+    console.log("App useeffect");
+  }, []);
 
   return (
     <div className="app-container">
-      <Navbar onSwitchView={handleSwitchView} />
+      <Navbar />
 
       {/* Page Content */}
       <main style={{ flex: 1, marginBottom: '40px' }}>
-        {view === 'shop' ? (
-          <Products onAddToCartSuccess={fetchCartCount} />
-        ) : view === 'cart' ? (
-          <Cart onSwitchView={handleSwitchView} />
-        ) : view === 'orders' ? (
-          <OrderHistory onSwitchView={handleSwitchView} />
-        ) : (
-          <Checkout
-            checkoutItems={checkoutData.items}
-            totalAmount={checkoutData.subtotal}
-            onBackToCart={() => setView('cart')}
-            onPaymentSuccess={fetchCartCount}
-          />
-        )}
+        <Outlet context={{ fetchCartCount }} />
       </main>
 
       {/* Footer */}
