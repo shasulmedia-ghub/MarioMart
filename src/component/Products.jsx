@@ -154,12 +154,9 @@ function Products({ onAddToCart = () => {} }) {
       console.log(data);
       setProducts(data);
     } catch (err) {
-      console.log('inside catch block');
       console.error(err);
-      setError('Failed to fetch products');
     } finally {
       setLoading(false);
-          console.log(productlist);
     }
   };
   
@@ -477,12 +474,16 @@ console.log(result);
                 {/* Product Image Container */}
                 {/* Category Badge */}
                   <div className="product-badge">
-                    {product.category_id}
+                    {product.category_name}
                   </div>
                 <div className="product-image-container">
                   
                   <div className="product-image-placeholder">
-                    <img src={product.default_image} alt={product.name} />
+                    <img 
+                      src={product.default_image} 
+                      alt={product.name} 
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                    />
                   </div>
                 </div>
                 
@@ -503,7 +504,7 @@ console.log(result);
                     ${product.unit_price}
                   </div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    <button
+                    {/*<button
                       className="mario-btn mario-btn-green"
                       style={{ 
                         fontSize: '0.65rem', 
@@ -515,7 +516,7 @@ console.log(result);
                       disabled={isOutOfStock}
                     >
                       Buy
-                    </button>
+                    </button> */}
                     <button
                       className="mario-btn mario-btn-red"
                       style={{ fontSize: '0.65rem', padding: '8px 12px' }}
