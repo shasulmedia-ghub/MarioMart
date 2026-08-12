@@ -14,7 +14,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
     stock_quantity: '50',    // 👈 Variant Stock Quantity
     size: '',                // 👈 Optional Variant Size
     colour: '',              // 👈 Optional Variant Colour
-    field: ''                // 👈 Optional Variant Field
+    field: '',               // 👈 Optional Variant Field
+    variant_id: '0'          // 👈 Optional Variant ID
   });
 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -44,7 +45,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
       stock_quantity: '50',
       size: '',
       colour: '',
-      field: ''
+      field: '',
+      variant_id: '0'
     });
     setShowProductModal(true);
   };
@@ -75,7 +77,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
         : (product.stock_quantity !== undefined ? product.stock_quantity : 50),
       size: product.size || '',
       colour: product.colour || '',
-      field: product.field || ''
+      field: product.field || '',
+      variant_id: product.variant_id || '0'
     });
     setShowProductModal(true);
   };
@@ -108,7 +111,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
       stock_status: status,
       size: productForm.size || '',
       colour: productForm.colour || '',
-      field: productForm.field || ''
+      field: productForm.field || '',
+      variant_id: productForm.variant_id || '0'
     };
 
     if (editingProduct) {
