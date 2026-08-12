@@ -172,6 +172,7 @@ function ProfileDropdown({ openMenu, toggle, close, handleLogout }) {
         <DropdownMenu
           items={[
             { label: 'Update Profile', to: '/profile' },
+            { label: 'Change Password', to: '/chgPassword' },
             { label: 'Logout', onClick: handleLogout },
           ]}
           onClose={close}
