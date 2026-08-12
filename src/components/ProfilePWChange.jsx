@@ -105,70 +105,86 @@ export default function ProfilePWChange() {
   // --------------------------------------------------
 
   const confirmPasswordChange = async () => {
-    if (!user?.id || !token) {
+  if (!user?.id || !token) {
+    setApiError(
+      'Your session has expired. Please log in again.'
+    );
+    setShowConfirm(false);
+    return;
+  }
+
+  setLoading(true);
+  setApiError('');
+
+  try {
+    const url = `${API_BASE}/api/users/${user.id}/password`;
+
+    console.log('=== PASSWORD CHANGE DEBUG ===');
+    console.log('URL:', url);
+    console.log('User ID:', user.id);
+    console.log('Method:', 'PATCH');
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        password: form.newPassword,
+      }),
+    });
+
+    const data = await response.json();
+
+    console.log('Password change response:', {
+      status: response.status,
+      data,
+    });
+
+    if (!response.ok) {
       setApiError(
-        'Your session has expired. Please log in again.'
+        data?.error ||
+        data?.message ||
+        'Unable to change password.'
       );
+
       setShowConfirm(false);
       return;
     }
 
-    setLoading(true);
-    setApiError('');
+    // Clear password fields after successful update
+    setForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
 
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/users/${user.id}/password`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            currentPassword: form.currentPassword,
-            newPassword: form.newPassword,
-          }),
-        }
-      );
+    setShowConfirm(false);
 
-      const data = await response.json();
+    navigate('/profile', {
+      replace: true,
+      state: {
+        passwordChanged: true,
+      },
+    });
 
-      if (!response.ok) {
-        setApiError(
-          data?.error ||
-          data?.message ||
-          'Unable to change password.'
-        );
-        setShowConfirm(false);
-        return;
-      }
+  } catch (error) {
+    console.error(
+      'Password change error:',
+      error
+    );
 
-      setShowConfirm(false);
+    setApiError(
+      'Network error. Please try again.'
+    );
 
-      navigate('/profile', {
-        replace: true,
-        state: {
-          passwordChanged: true,
-        },
-      });
+    setShowConfirm(false);
 
-    } catch (error) {
-      console.error(
-        'Password change error:',
-        error
-      );
-
-      setApiError(
-        'Network error. Please try again.'
-      );
-
-      setShowConfirm(false);
-
-    } finally {
-      setLoading(false);
-    }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   // --------------------------------------------------
   // UI

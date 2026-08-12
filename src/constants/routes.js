@@ -8,11 +8,11 @@ const ROUTES = {
   HOME: "/",
   LOGIN: "/pages/login",
   REGISTER: "/pages/register",
-  FORGOT_PASSWORD: "/pages/forgot-password",
+  FORGOT_PASSWORD: "/components/ProfilePWChange",
 
   // Customer Routes
   DASHBOARD: "/pages/dashboard",
-  PROFILE: "/pages/profile",
+  PROFILE: "/components/UpdateProfile",
 
   // Product Routes (Member 2)
   PRODUCTS: "/products",
