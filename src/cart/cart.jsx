@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 //import { MOCK_PRODUCTS, getProductStockQuantity } from '../component/Products.jsx';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
 function Cart() {
@@ -11,6 +12,7 @@ function Cart() {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null); // Tracks ID of item in progress
   const { user, role, isAuthenticated, logout } = useAuth();
+  const { refreshCartCount } = useCart();
   const userId = user.id;
 
   // Fetch cart items on component mount
@@ -112,7 +114,7 @@ function Cart() {
           body: JSON.stringify(payload)
         });
       }
-
+      refreshCartCount();
     } catch (err) {
       console.warn("Failed to synchronize quantity to backend, updated locally:", err);
     } finally {
@@ -157,10 +159,12 @@ function Cart() {
             method: 'DELETE'
           });
         }
+        refreshCartCount();
       } catch (err) {
         console.warn("Failed to delete from backend, removed locally:", err);
       } finally {
         setActionLoading(null);
+        refreshCartCount();
       }
     }
   };

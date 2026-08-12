@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import ProductModal from '../components/ProductModal.jsx';
 
 
@@ -127,17 +127,14 @@ function Products({ onAddToCart = () => {} }) {
   const [error, setError] = useState(null);
   const [productlist, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('name-asc');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState(null);
-
-  const categoryScrollRef = useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
 
 
     // Fetch from database
@@ -165,17 +162,6 @@ useEffect(() => {
   fetchProducts();
 }, []);
 
-
-  const checkScroll = useCallback(() => {
-    const el = categoryScrollRef.current;
-    if (el) {
-      const scrollLeft = el.scrollLeft;
-      const scrollWidth = el.scrollWidth;
-      const clientWidth = el.clientWidth;
-      setCanScrollLeft(scrollLeft > 1);
-      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
-    }
-  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -207,27 +193,10 @@ useEffect(() => {
     return () => { isMounted = false; };
   }, []);
 
-  useEffect(() => {
-    checkScroll();
-    const el = categoryScrollRef.current;
-    if (el) {
-      el.addEventListener('scroll', checkScroll);
-    }
-    window.addEventListener('resize', checkScroll);
-    return () => {
-      if (el) {
-        el.removeEventListener('scroll', checkScroll);
-      }
-      window.removeEventListener('resize', checkScroll);
-    };
-  }, [checkScroll, categories, categoriesLoading]);
-
-  const handleScroll = (direction) => {
-    const el = categoryScrollRef.current;
-    if (el) {
-      const amount = el.clientWidth * 0.75 || 200;
-      el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
-    }
+  const toggleCategory = (code) => {
+    setSelectedCategories((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+    );
   };
 
   // Stock badge styling helper
@@ -250,14 +219,16 @@ useEffect(() => {
     let result = productlist;
 console.log('inside filtered products');
 console.log(result);
-    // Category filter
-    if (selectedCategory !== null) {
-      result = result.filter(
-        (p) =>
-          p.category_id === selectedCategory ||
-          p.category_code === selectedCategory ||
-          String(p.category_id) === String(selectedCategory) ||
-          (p.category_code && String(p.category_code) === String(selectedCategory))
+    // Category filter — OR logic across all selected categories
+    if (selectedCategories.length > 0) {
+      result = result.filter((p) =>
+        selectedCategories.some(
+          (code) =>
+            p.category_id === code ||
+            p.category_code === code ||
+            String(p.category_id) === String(code) ||
+            (p.category_code && String(p.category_code) === String(code))
+        )
       );
     }
 
@@ -289,7 +260,7 @@ console.log(result);
     });
 
     return result;
-  }, [productlist, searchQuery, selectedCategory, sortBy]);
+  }, [productlist, searchQuery, selectedCategories, sortBy]);
 
   const handleOpenModal = (product) => {
     setSelectedProduct(product);
@@ -342,86 +313,48 @@ console.log(result);
             <option value="price-desc">Sort by: Price (High to Low)</option>
             <option value="date-desc">Sort by: Newest Arrivals</option>
           </select>
+          <button
+            type="button"
+            className={`mario-btn ${showFilters ? 'mario-btn-red' : 'mario-btn-yellow'}`}
+            onClick={() => setShowFilters((prev) => !prev)}
+            aria-expanded={showFilters}
+            aria-label="Toggle category filters"
+            style={{ fontSize: '0.75rem', padding: '8px 14px', whiteSpace: 'nowrap' }}
+          >
+            🏷️ Filter{selectedCategories.length > 0 ? ` (${selectedCategories.length})` : ''}
+          </button>
         </div>
 
-        <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
-          {canScrollLeft && (
+        {showFilters && (
+          <div className="category-filters">
             <button
               type="button"
-              className="category-btn"
-              onClick={() => handleScroll('left')}
-              aria-label="Scroll Left"
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 5,
-                padding: '6px 10px',
-                minWidth: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'var(--mario-yellow)',
-                border: '2px solid var(--dark-text)',
-                borderRadius: '50%',
-                boxShadow: '0 3px 0 var(--dark-text)',
-                cursor: 'pointer',
-              }}
-            >
-              ◀
-            </button>
-          )}
-
-          <div
-            ref={categoryScrollRef}
-            className="category-filters"
-            style={{
-              display: 'flex',
-              overflowX: 'auto',
-              flexWrap: 'nowrap',
-              maxWidth: '100%',
-              paddingBottom: '8px',
-              gap: '12px',
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              paddingLeft: canScrollLeft ? '40px' : '0px',
-              paddingRight: canScrollRight ? '40px' : '0px',
-              transition: 'padding 0.2s ease',
-            }}
-          >
-            <button
-              type="button"
-              className={`category-btn ${selectedCategory === null ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(null)}
-              style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+              className={`category-btn ${selectedCategories.length === 0 ? 'active' : ''}`}
+              onClick={() => setSelectedCategories([])}
             >
               All Items
             </button>
 
             {categoriesLoading ? (
-              <span style={{ fontSize: '0.85rem', color: '#64748B', alignSelf: 'center', flexShrink: 0 }}>
+              <span style={{ fontSize: '0.85rem', color: '#64748B', alignSelf: 'center' }}>
                 Loading categories...
               </span>
             ) : categoriesError ? (
-              <span style={{ fontSize: '0.85rem', color: 'var(--mario-red)', alignSelf: 'center', flexShrink: 0 }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--mario-red)', alignSelf: 'center' }}>
                 Failed to load categories
               </span>
             ) : (
               categories.map((cat, idx) => {
                 const code = cat.code !== undefined ? cat.code : (cat.id !== undefined ? cat.id : cat.slug);
                 const label = cat.description || cat.category_name || cat.name || cat.label || String(code);
-                const isSelected = selectedCategory === code || String(selectedCategory) === String(code);
+                const isSelected = selectedCategories.some((c) => String(c) === String(code));
 
                 return (
                   <button
                     key={cat.id || cat.code || cat.slug || idx}
                     type="button"
                     className={`category-btn ${isSelected ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(code)}
-                    style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+                    onClick={() => toggleCategory(code)}
                   >
                     {label}
                   </button>
@@ -429,36 +362,7 @@ console.log(result);
               })
             )}
           </div>
-
-          {canScrollRight && (
-            <button
-              type="button"
-              className="category-btn"
-              onClick={() => handleScroll('right')}
-              aria-label="Scroll Right"
-              style={{
-                position: 'absolute',
-                right: 0,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 5,
-                padding: '6px 10px',
-                minWidth: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'var(--mario-yellow)',
-                border: '2px solid var(--dark-text)',
-                borderRadius: '50%',
-                boxShadow: '0 3px 0 var(--dark-text)',
-                cursor: 'pointer',
-              }}
-            >
-              ▶
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Products Grid */}
