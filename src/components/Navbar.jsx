@@ -171,7 +171,7 @@ function ProfileDropdown({ openMenu, toggle, close, handleLogout }) {
         aria-haspopup="true"
         aria-expanded={openMenu === 'profile'}
         aria-label="User profile menu"
-        style={{ background: 'none', border: '2px solid var(--mario-yellow)', borderRadius: '50%', width: '40px', height: '40px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', color: 'var(--mario-yellow)', transition: 'transform 0.1s ease' }}
+        style={{ background: 'none', border: '2px solid var(--mario-yellow)', borderRadius: '50%', width: '60px', height: '40px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', color: 'var(--mario-yellow)', transition: 'transform 0.1s ease' }}
         onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
         onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
       >
