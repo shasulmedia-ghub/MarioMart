@@ -14,6 +14,8 @@ import Products from './component/Products.jsx'
 import Cart from './cart/cart.jsx'
 import Checkout from './checkout/checkout.jsx'
 import OrderHistory from './order/orderHistory.jsx'
+import ChgPassword from './component/ChgPassword.jsx'
+import Profile from './components/Profile.jsx'
 import Fulfillment from './Admin/fulfillment.jsx'
 import SalesDashboard from './Admin/dashboard.jsx'
 import UserManagement from './Admin/UserManagement.jsx'
@@ -29,6 +31,8 @@ createRoot(document.getElementById('root')).render(
             <Route path="/cart"     element={<ProtectedRoute><Cart /></ProtectedRoute>} />
             <Route path="/orders"   element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+            <Route path="/chgPassword" element={<ProtectedRoute><ChgPassword /></ProtectedRoute>} />
+            <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           </Route>
 
           {/* Admin protected routes */}
