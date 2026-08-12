@@ -157,7 +157,7 @@ function UserProducts({ onAddToCart = () => {} }) {
           </select>
         </div>
 
-        <div className="category-filters">
+        {/* <div className="category-filters">
           <button
             className={`category-btn ${selectedCategory === null ? 'active' : ''}`}
             onClick={() => setSelectedCategory(null)}
@@ -182,6 +182,29 @@ function UserProducts({ onAddToCart = () => {} }) {
           >
             Outfits & Suits
           </button>
+        </div> */}
+        {/* change to only show the category name from database */}
+        <div className="category-filters" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+          <button
+            className={`category-btn ${selectedCategory === null ? 'active' : ''}`}
+            onClick={() => setSelectedCategory(null)}
+          >
+            All Items
+          </button>
+          {categories.map((cat) => {
+            const catId = typeof cat === 'object' ? cat.id : cat;
+            const catName = typeof cat === 'object' ? (cat.category_name || cat.name) : cat;
+            
+            return (
+              <button
+                key={catId}
+                className={`category-btn ${String(selectedCategory) === String(catId) || String(selectedCategory) === String(catName) ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(catId)}
+              >
+                {catName}
+              </button>
+            );
+          })}
         </div>
       </div>
 

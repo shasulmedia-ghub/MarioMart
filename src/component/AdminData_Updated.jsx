@@ -25,21 +25,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
   
   // const handleOpenAddProduct = () => {
   
-  //   // Determine a safe initial default category ID string or fallback integer
-  //   const defaultCat = categories[0] && typeof categories[0] === 'object' 
-  //     ? categories[0].id 
-  //     : (categories[0] || '');
-
-  //   setEditingProduct(null);
-  //   setProductForm({
-  //     product_name: '',
-  //     category_id: defaultCat,
-  //     price: '',
-  //     description: '',
-  //     image_url: '🍄',
-  //     stockQuantity: '50'
-  //   });
-  //   setShowProductModal(true);
   // }; replace with the following
   const handleOpenAddProduct = () => {
     setEditingProduct(null);
@@ -156,33 +141,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
       }
     } else {
       
-      // CREATE Product in database
-  //     try {
-  //       const res = await fetch('https://mm-api-virid.vercel.app/api/products', {
-  //         method: 'POST',
-  //         headers: { 'Content-Type': 'application/json' },
-  //         body: JSON.stringify(productPayload)
-  //       });
-  //       if (!res.ok) throw new Error('API save failed');
-  //       const created = await res.json();
-        
-  //       setProducts(prev => [created, ...prev]);
-  //       alert("Product has been added successfully");
-  //     } catch (err) {
-  //       console.warn("DB Create failed, falling back locally:", err.message);
-  //       const newProduct = {
-  //         id: Date.now(),
-  //         ...productForm,
-  //         price: parseFloat(productForm.price).toFixed(2),
-  //         stock_quantity: qty,
-  //         stockStatus: status
-  //       };
-  //       setProducts(prev => [newProduct, ...prev]);
-  //       alert("Product added locally (offline mode)");
-  //     }
-  //   }
-  //   setShowProductModal(false);
-  // };
   try {
         const res = await fetch('https://mm-api-virid.vercel.app/api/products', {
           method: 'POST',
@@ -245,8 +203,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
     // 💡 FIXED: Extract the raw ID if an object is passed, ensuring editingCategory is just the ID
     const catId = cat && typeof cat === 'object' ? cat.id : cat;
     setEditingCategory(catId);
-    // Support category structure as string or relational object properties safely
-    setEditingCategory(cat);
     setCategoryName(typeof cat === 'object' ? cat.category_name : cat);
     setShowCategoryModal(true);
   };
@@ -257,22 +213,31 @@ export default function AdminData({ products, setProducts, categories, setCatego
 
     const computedSlug = categoryName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
 
-    if (editingCategory && typeof editingCategory === 'object') {
-      // UPDATE Category 
+    if (editingCategory) {
+      // ✅ UPDATE Category
       try {
-        const res = await fetch(`https://vercel.app{editingCategory.id}`, {
+        const res = await fetch(`https://mm-api-virid.vercel.app/api/categories/${editingCategory}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            categoryName: categoryName, // ✅ Updated to camelCase
+            categoryName: categoryName, 
             slug: computedSlug
           })
         });
-        if (!res.ok) throw new Error('API update failed');
+        
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`API update failed: ${errText}`);
+        }
+        
         const updatedCat = await res.json();
-        setCategories(prev => prev.map(c => c.id === editingCategory.id ? updatedCat : c));
+        
+        setCategories(prev => prev.map(c => (typeof c === 'object' ? c.id === editingCategory : c === editingCategory) ? updatedCat : c));
+        alert("Category updated successfully in database!");
       } catch (err) {
-        console.warn("Category update failed on DB, applying locally:", err.message);
+        console.error("Category update failed on DB:", err.message);
+        alert(`Could not update category: ${err.message}`);
+        return;
       }
     } else {
       // ➕ CREATE Category
@@ -281,8 +246,8 @@ export default function AdminData({ products, setProducts, categories, setCatego
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            categoryName: categoryName, // ✅ FIXED: Changed from category_name to categoryName
-            slug: computedSlug         // ✅ Passed the required url slug parameter
+            categoryName: categoryName, 
+            slug: computedSlug         
           })
         });
         
@@ -292,15 +257,12 @@ export default function AdminData({ products, setProducts, categories, setCatego
         }
         
         const newCategoryObj = await res.json();
-        
-        // Save the verified database response array directly
         setCategories(prev => [...prev, newCategoryObj]);
         setCategoryName(''); 
         alert("Category saved successfully to database!");
 
       } catch (err) {
         console.warn("Category storage hook rejected payload, saving fallback mock:", err.message);
-        // Fallback local code if network behaves unexpectedly
         setCategories(prev => [...prev, { id: Date.now(), category_name: categoryName }]);
       }
     }
@@ -312,26 +274,35 @@ export default function AdminData({ products, setProducts, categories, setCatego
   const handleDeleteCategory = async (catToDelete) => {
     const isObj = catToDelete && typeof catToDelete === 'object';
     const displayTitle = isObj ? catToDelete.category_name : catToDelete;
-    const targetId = isObj ? catToDelete.id : null;
+    // 💡 FIXED: Safely extract the target ID number/string
+    const targetId = isObj ? catToDelete.id : catToDelete;
 
     if (!window.confirm(`Delete category "${displayTitle}"? Products in this category will be unassigned.`)) return;
 
-    // ✅ FIXED: Added persistent DELETE route communication with backend server
     if (targetId) {
       try {
-        const res = await fetch(`https://vercel.app{targetId}`, {
+        const res = await fetch(`https://mm-api-virid.vercel.app/api/categories/${targetId}`, {
           method: 'DELETE'
         });
-        if (!res.ok) throw new Error('API delete category route failed');
         
-        setCategories(prev => prev.filter(c => c.id !== targetId));
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`API delete failed: ${errText}`);
+        }
+        
+        // Successfully deleted from database, now update state
+        setCategories(prev => prev.filter(c => (typeof c === 'object' ? c.id !== targetId : c !== targetId)));
         setProducts(prev => prev.map(p => {
-          const isTarget = typeof p.category_id === 'object' ? p.category_id.id === targetId : p.category_id === targetId;
+          const isTarget = typeof p.category_id === 'object' ? p.category_id?.id === targetId : p.category_id === targetId;
           return isTarget ? { ...p, category_id: 'Unassigned' } : p;
         }));
+        
+        alert("Category deleted successfully from database!");
         return;
       } catch (err) {
-        console.warn("DB Category delete request failed, falling back locally:", err.message);
+        console.error("DB Category delete request failed:", err.message);
+        alert(`Could not delete from database: ${err.message}`);
+        return; 
       }
     }
 
@@ -498,22 +469,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
               </thead>
               <tbody>
                 {/* {categories.map((cat, index) => {
-                  const count = products.filter(p => p.category_id === cat).length;
-                  return (
-                    <tr key={index}>
-                      <td><strong>{cat}</strong></td>
-                      <td>{count} product(s)</td>
-                      <td style={{ textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                        <button className="mario-btn mario-btn-yellow" style={{ padding: '6px 10px', fontSize: '0.55rem' }} onClick={() => handleOpenEditCategory(cat)}>
-                          Edit
-                        </button>
-                        <button className="mario-btn mario-btn-red" style={{ padding: '6px 10px', fontSize: '0.55rem' }} onClick={() => handleDeleteCategory(cat)}>
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })} */}
+                  */}
                 {/* replace this block with below */}
                 {categories.map((cat, index) => {
                   // 1. Safely extract the display name and unique database matching properties
@@ -538,21 +494,24 @@ export default function AdminData({ products, setProducts, categories, setCatego
                       {/* ✅ FIXED: Renders the categoryLabel string instead of the raw object */}
                       <td><strong>{categoryLabel}</strong></td>
                       <td>{count} product(s)</td>
-                      <td style={{ textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                        <button 
-                          className="mario-btn mario-btn-yellow" 
-                          style={{ padding: '6px 10px', fontSize: '0.55rem' }} 
-                          onClick={() => handleOpenEditCategory(cat)}
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          className="mario-btn mario-btn-red" 
-                          style={{ padding: '6px 10px', fontSize: '0.55rem' }} 
-                          onClick={() => handleDeleteCategory(cat)}
-                        >
-                          Delete
-                        </button>
+                      <td style={{ textAlign: 'center', verticalAlign: 'middle', height: '100%', padding: '0 12px' }}>
+                        {/* 💡 FIXED: Uses an inner flex container matching the cell height cleanly */}
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '45px' }}>
+                          <button 
+                            className="mario-btn mario-btn-yellow" 
+                            style={{ padding: '6px 10px', fontSize: '0.55rem' }} 
+                            onClick={() => handleOpenEditCategory(cat)}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            className="mario-btn mario-btn-red" 
+                            style={{ padding: '6px 10px', fontSize: '0.55rem' }} 
+                            onClick={() => handleDeleteCategory(cat)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -736,7 +695,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
               </button>
             </form>
           </div>
-          {/* test with change */}
         </div>
       )}
     </div>
