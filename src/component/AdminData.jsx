@@ -41,6 +41,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
       stock_quantity: '50',
       size: '',
       colour: '',
+      new_arrival: false, // 👈 1. Reset new_arrival to false on add
       field: ''
     });
     setShowProductModal(true);
@@ -61,17 +62,30 @@ export default function AdminData({ products, setProducts, categories, setCatego
         ? product.unit_price
         : (product.unit_price !== undefined && product.unit_price !== null ? product.unit_price : ''));
 
+    let cleanImageName = product.default_image || '';
+    // Strip whichever folder path prefix might be saved in the database
+    const pathsToStrip = ['/product_image/'];
+    for (const path of pathsToStrip) {
+      if (cleanImageName.startsWith(path)) {
+        cleanImageName = cleanImageName.replace(path, '');
+        break;
+      }
+    }
+    
     setProductForm({
-      product_name: product.product_name,
+      product_name: product.product_name || '',
       category_id: currentCategoryId || '',
-      unit_price: resolvedPrice, // 👈 Ensures current price is populated
-      description: product.description,
-      default_image: null, // 👈 Null by default during edit unless a new file is chosen
+      unit_price: resolvedPrice,
+      description: product.description || '',
+      // 🛠️ FIX: Use the existing database image if available instead of forcing null
+      default_image: cleanImageName || '',
       stock_quantity: product.stock_quantity !== undefined && product.stock_quantity !== null
         ? product.stock_quantity
-        : (product.stock_quantity !== undefined ? product.stock_quantity : 50),
+        : 50,
       size: product.size || '',
       colour: product.colour || '',
+      // 🛠️ FIX: Ensure new_arrival is included from the database
+      new_arrival: product.new_arrival ? true : false,
       field: product.field || ''
     });
     setShowProductModal(true);
@@ -99,7 +113,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
     const productPayload = {
       product_name: productForm.product_name,
       description: productForm.description,
-      default_image: finalDefaultImageUrl, // 👈 Uses the newly generated auto filename path
+      default_image: productForm.default_image || '', // 👈 Uses the newly generated auto filename path
       image_url: finalDefaultImageUrl, // 👈 Explicitly sync variant image_url
       category_id: productForm.category_id,
       unit_price: parseFloat(productForm.unit_price) || 0,
@@ -107,7 +121,9 @@ export default function AdminData({ products, setProducts, categories, setCatego
       stock_status: status,
       size: productForm.size || '',
       colour: productForm.colour || '',
-      field: productForm.field || ''
+      new_arrival: productForm.new_arrival ? true : false, // 👈 2. Included here so it gets sent to the API
+      field: productForm.field || '',
+      new_arrival: productForm.new_arrival ? true : false
     };
 
     console.log("🚀 PAYLOAD BEING SENT TO API:", JSON.stringify(productPayload, null, 2));
@@ -385,7 +401,13 @@ export default function AdminData({ products, setProducts, categories, setCatego
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           {product.default_image ? (
                             <img
-                              src={product.default_image}
+                              //src={product.default_image}
+                            src={
+                              product.default_image.startsWith('http') || product.default_image.startsWith('/')
+                                ? product.default_image
+                                : `/product_image/${product.default_image}` // 👈 Re-adds the folder path for rendering
+                            }
+                              
                               alt={product.product_name || 'Product Image'}
                               style={{
                                 maxWidth: '100px',
@@ -701,7 +723,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
               </button>
             </form>
           </div>
-          {/* test with change */}
         </div>
       )}
     </div>
