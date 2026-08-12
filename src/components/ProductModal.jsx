@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 function ProductModal({ product, onClose }) {
   const { user } = useAuth();
+  const { refreshCartCount } = useCart();
   const userId = user?.id;
 
   const [variants, setVariants] = useState([]);
@@ -121,6 +123,7 @@ console.log(selectedVariant);
         throw new Error('Failed to add to cart');
       }
 
+      refreshCartCount();
       setFeedbackMsg('Added to cart!');
       setTimeout(() => setFeedbackMsg(''), 3000);
     } catch (err) {

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import logoSrc from '../assets/mm_logo/mariomart_logo.jpg';
 
 export default function Navbar() {
-  const { user, role, isAuthenticated, logout } = useAuth();
+  const { role, isAuthenticated, logout } = useAuth();
+  const { cartCount } = useCart();
   const navigate = useNavigate();
 
   // Which dropdown is open: null | 'profile' | 'admin' | 'sales'
@@ -83,7 +85,7 @@ export default function Navbar() {
               style={{ textDecoration: 'none' }}
               aria-label="View shopping cart"
             >
-              <span>🛒</span> Cart
+              <span>🛒</span> Cart <span className="cart-badge">{cartCount}</span>
             </Link>
             <Link
               to="/orders"

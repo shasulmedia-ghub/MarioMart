@@ -13,6 +13,7 @@ import OrderHistory from './order/orderHistory.jsx';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ProductModal from './components/ProductModal.jsx';
+import { CartProvider } from './context/CartContext.jsx';
 
 function App() {
   const [cartCount, setCartCount] = useState(0);
@@ -54,17 +55,19 @@ function App() {
   }, []);
 
   return (
-    <div className="app-container">
-      <Navbar />
+    <CartProvider>
+      <div className="app-container">
+        <Navbar />
 
-      {/* Page Content */}
-      <main style={{ flex: 1, marginBottom: '40px' }}>
-        <Outlet context={{ fetchCartCount }} />
-      </main>
+        {/* Page Content */}
+        <main style={{ flex: 1, marginBottom: '40px' }}>
+          <Outlet context={{ fetchCartCount }} />
+        </main>
 
-      {/* Footer */}
-      <Footer />
-    </div>
+        {/* Footer */}
+        <Footer />
+      </div>
+    </CartProvider>
   );
 }
 

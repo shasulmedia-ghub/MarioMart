@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 
@@ -302,7 +302,23 @@ const Checkout = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [shippingAddress, setShippingAddress] = useState('');
   const [shippingAddressError, setShippingAddressError] = useState('');
-  const { user, role, isAuthenticated, logout } = useAuth();
+  const { user, role, isAuthenticated, logout, token } = useAuth();
+
+  // Pre-fill shipping address from user profile if field is still empty
+  useEffect(() => {
+    if (!user?.id || shippingAddress !== '') return;
+    fetch(`https://mm-api-virid.vercel.app/api/users/${user.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        const row = Array.isArray(data) ? data[0] : data;
+        const addr = row?.address ?? '';
+        if (addr) setShippingAddress(addr);
+      })
+      .catch(() => { /* silently ignore — user can type manually */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
 // const email variable
 const email = user.email;
