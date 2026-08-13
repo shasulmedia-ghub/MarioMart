@@ -1,18 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import logoSrc from '../assets/mm_logo/mariomart_logo.jpg';
 
-export default function Navbar({ onSwitchView }) {
-  const { user, role, isAuthenticated, logout } = useAuth();
+export default function Navbar() {
+  const { role, isAuthenticated, logout } = useAuth();
+  const { cartCount } = useCart();
   const navigate = useNavigate();
-
-console.log('=== NAVBAR AUTH DEBUG ===');
-console.log('user:', user);
-console.log('role:', role);
-console.log('isAuthenticated:', isAuthenticated);
-console.log('token:', localStorage.getItem('mm_token'));
-console.log('=========================');
 
   // Which dropdown is open: null | 'profile' | 'admin' | 'sales'
   const [openMenu, setOpenMenu] = useState(null);
@@ -86,19 +81,17 @@ console.log('=========================');
               className="cart-button"
               onClick={() => {
                 close();
-                if (onSwitchView) onSwitchView('cart');
               }}
               style={{ textDecoration: 'none' }}
               aria-label="View shopping cart"
             >
-              <span>🛒</span> Cart
+              <span>🛒</span> Cart <span className="cart-badge">{cartCount}</span>
             </Link>
             <Link
               to="/orders"
               className="mario-nav-link"
               onClick={() => {
                 close();
-                if (onSwitchView) onSwitchView('orders');
               }}
               style={{ textDecoration: 'none' }}
             >
@@ -171,7 +164,7 @@ function ProfileDropdown({ openMenu, toggle, close, handleLogout }) {
         aria-haspopup="true"
         aria-expanded={openMenu === 'profile'}
         aria-label="User profile menu"
-        style={{ background: 'none', border: '2px solid var(--mario-yellow)', borderRadius: '50%', width: '60px', height: '40px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', color: 'var(--mario-yellow)', transition: 'transform 0.1s ease' }}
+        style={{ background: 'none', border: '2px solid var(--mario-yellow)', borderRadius: '50%', width: '40px', height: '40px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', color: 'var(--mario-yellow)', transition: 'transform 0.1s ease' }}
         onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
         onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
       >
@@ -181,7 +174,7 @@ function ProfileDropdown({ openMenu, toggle, close, handleLogout }) {
         <DropdownMenu
           items={[
             { label: 'Update Profile', to: '/profile' },
-            { label: 'Update Password', to: '/profile/password' },
+            { label: 'Change Password', to: '/chgPassword' },
             { label: 'Logout', onClick: handleLogout },
           ]}
           onClose={close}

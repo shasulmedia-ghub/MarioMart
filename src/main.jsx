@@ -6,40 +6,48 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 import App from './App.jsx'
-import Login from './pages/login.jsx'
+import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
-import UpdateProfile from './components/UpdateProfile.jsx'
-import ProfilePWChange from './components/ProfilePWChange.jsx'
 import AdminDashboard from './component/AdminDashboard.jsx'
 import ProductDetails from './component/ProductDetails.jsx'
+import Products from './component/Products.jsx'
+import Cart from './cart/cart.jsx'
+import Checkout from './checkout/checkout.jsx'
+import OrderHistory from './order/orderHistory.jsx'
+import ChgPassword from './component/ChgPassword.jsx'
+import Profile from './components/Profile.jsx'
+import Fulfillment from './Admin/fulfillment.jsx'
+import SalesDashboard from './Admin/dashboard.jsx'
+import UserManagement from './Admin/UserManagement.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* ── Public routes ── */}
-          <Route path="/"         element={<App />} />
-          <Route path="/login"    element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<UpdateProfile />} />
-<Route path="/profile/password" element={<ProfilePWChange />} />
-
-          {/* ── Protected routes ── */}
-          <Route path="/cart"    element={<ProtectedRoute><App /></ProtectedRoute>} />
-          <Route path="/orders"  element={<ProtectedRoute><App /></ProtectedRoute>} />
-          <Route path="/checkout" element={<ProtectedRoute><App /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><App /></ProtectedRoute>} />
+          {/* ── App Layout Routes ── */}
+          <Route element={<App />}>
+            <Route path="/"         element={<Products />} />
+            <Route path="/cart"     element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path="/orders"   element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
+            <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+            <Route path="/chgPassword" element={<ProtectedRoute><ChgPassword /></ProtectedRoute>} />
+            <Route path="/profile"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          </Route>
 
           {/* Admin protected routes */}
-          <Route path="/admin/dashboard"   element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/dashboard"   element={<ProtectedRoute><SalesDashboard /></ProtectedRoute>} />
           <Route path="/admin/category"    element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/product"     element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/user"        element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/fulfillment" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/user"        element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+          <Route path="/admin/fulfillment" element={<ProtectedRoute><Fulfillment /></ProtectedRoute>} />
 
           {/* Product detail — public */}
           <Route path="/ProductDetails/:id" element={<ProductDetails />} />
+
+          {/* Login/Register stand-alone routes */}
+          <Route path="/login"    element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

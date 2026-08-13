@@ -9,7 +9,7 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import "../App.css";
-import mmlogo from "../assets/mm_logo/mariomart_logo.jpg";
+ import mmlogo from "../assets/mm_logo/mariomart_logo.jpg";
 
 //   const imgStyle = {
 //   height: "50px",

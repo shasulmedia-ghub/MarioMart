@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 function ProductModal({ product, onClose }) {
   const { user } = useAuth();
+  const { refreshCartCount } = useCart();
   const userId = user?.id;
 
   const [variants, setVariants] = useState([]);
@@ -121,6 +123,7 @@ console.log(selectedVariant);
         throw new Error('Failed to add to cart');
       }
 
+      refreshCartCount();
       setFeedbackMsg('Added to cart!');
       setTimeout(() => setFeedbackMsg(''), 3000);
     } catch (err) {
@@ -130,7 +133,7 @@ console.log(selectedVariant);
     }
   };
 
-  const displayImage = selectedVariant?.image || product.default_image || product.image_url;
+  const displayImage = selectedVariant?.image_url || product.default_image || product.image_url;
   const stockQuantity = selectedVariant 
     ? Number(selectedVariant.stock_quantity || 0) 
     : Number(product.stock_quantity || 0);
@@ -181,15 +184,15 @@ console.log(selectedVariant);
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--mario-red)', fontFamily: 'var(--font-main)' }}>{error}</div>
         ) : (
           <>
-            <div className="modal-header-section" style={{ borderBottom: 'none' }}>
-              <div className="modal-image" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div className="modal-header-section" style={{ borderBottom: 'none', display: 'flex', flexDirection: 'column', width: '100%' }}>
+              <div className="product-image-placeholder" style={{ width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem' }}>
                 {displayImage && (displayImage.startsWith('http') || displayImage.startsWith('/')) ? (
-                   <img src={displayImage} alt={productName} style={{ maxWidth: '100%', maxHeight: '150px', objectFit: 'contain' }} />
+                   <img src={displayImage} alt={productName} style={{ width: '100%', maxHeight: '300px', objectFit: 'contain' }} />
                 ) : (
-                   <div style={{ fontSize: '4rem' }}>{displayImage || '📦'}</div>
+                   <div style={{ fontSize: '6rem' }}>{displayImage || '📦'}</div>
                 )}
               </div>
-              <div className="modal-title-area">
+              <div className="modal-title-area" style={{ width: '100%' }}>
                 <h3 className="modal-title">{productName}</h3>
                 <p style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: '8px', fontFamily: 'var(--font-main)' }}>
                   {categoryName && `Category: ${categoryName}`}
@@ -197,11 +200,12 @@ console.log(selectedVariant);
                 <p style={{ fontSize: '0.95rem', marginBottom: '12px', fontFamily: 'var(--font-main)' }}>
                   {product.description}
                 </p>
-                <span className={`stock-badge ${stock.className}`}>
-                  {stock.label} ({stockQuantity} available)
-                </span>
-                <div style={{ marginTop: '12px', fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--dark-text)' }}>
-                  ${Number(price).toFixed(2)}
+
+                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px', fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--dark-text)' }}>
+                  <span>${Number(price).toFixed(2)}</span>
+                  <span className={`stock-badge ${stock.className}`}>
+                    {stock.label} ({stockQuantity} available)
+                  </span>
                 </div>
               </div>
             </div>
