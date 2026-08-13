@@ -125,7 +125,7 @@ export default function UserManagement() {
       <Navbar />
       
       <main style={{ flex: 1, marginBottom: '40px' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0px' }}>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '16px' }}>
             <h2 className="section-title" style={{ margin: 0 }}>
@@ -150,8 +150,8 @@ export default function UserManagement() {
             </div>
           ) : (
             <>
-              <div className="desktop-table-container" style={{ overflowX: 'auto', background: 'var(--cloud-white)', padding: '24px', border: '4px solid var(--dark-text)', borderRadius: '20px', boxShadow: '0 8px 0 var(--dark-text)' }}>
-                <table className="db-details-table">
+              <div className="desktop-table-container" style={{ overflowX: 'auto', background: 'var(--cloud-white)', padding: '0px', border: '4px solid var(--dark-text)', borderRadius: '20px', boxShadow: '0 px 0 var(--dark-text)' }}>
+                <table className="db-details-table" style={{ margin: 0, border: 'none' }}>
                   <thead>
                     <tr>
                       <th>Name</th>
