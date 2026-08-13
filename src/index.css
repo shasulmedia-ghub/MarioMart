@@ -123,8 +123,9 @@ a {
 
 .navbar-links {
   display: flex;
-  align-items: center;
+  align-items: bottom;
   gap: 6px;
+  margin-left: 50px;
 }
 
 .navbar-link {
