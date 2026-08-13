@@ -100,30 +100,26 @@ export default function AdminData({ products, setProducts, categories, setCatego
     else if (qty <= 10) status = 'low';
 
     const defaultFolderPath = '/product_image/';
-
-    let finalDefaultImageUrl = productForm.default_image || '';
-
-    // If the user typed something and it's not already a full URL or path starting with '/'
-    if (finalDefaultImageUrl && !finalDefaultImageUrl.startsWith('http') && !finalDefaultImageUrl.startsWith('/')) {
-      finalDefaultImageUrl = `${defaultFolderPath}${finalDefaultImageUrl}`;
+    let rawImageInput = (productForm.default_image || '').trim();
+    
+    let finalPathImage = rawImageInput;
+    if (finalPathImage && !finalPathImage.startsWith('http') && !finalPathImage.startsWith('/')) {
+      finalPathImage = `${defaultFolderPath}${finalPathImage}`;
     }
 
-    // ✅ FIXED: Corrected category_id pointer assignment typo
-    // ✅ Match backend database variant schema requirements
     const productPayload = {
       product_name: productForm.product_name,
       description: productForm.description,
-      default_image: productForm.default_image || '', // 👈 Uses the newly generated auto filename path
-      image_url: finalDefaultImageUrl, // 👈 Explicitly sync variant image_url
+      default_image: finalPathImage,
+      image_url: finalPathImage,
       category_id: productForm.category_id,
       unit_price: parseFloat(productForm.unit_price) || 0,
       stock_quantity: qty,
       stock_status: status,
       size: productForm.size || '',
       colour: productForm.colour || '',
-      new_arrival: productForm.new_arrival ? true : false, // 👈 2. Included here so it gets sent to the API
-      field: productForm.field || '',
-      new_arrival: productForm.new_arrival ? true : false
+      new_arrival: productForm.new_arrival ? true : false,
+      field: productForm.field || ''
     };
 
     console.log("🚀 PAYLOAD BEING SENT TO API:", JSON.stringify(productPayload, null, 2));
@@ -142,7 +138,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
         }
 
         const updatedFromServer = await res.json();
-
         setProducts(prev => prev.map(p => p.id === editingProduct ? updatedFromServer : p));
         alert("Product updated successfully!");
       } catch (err) {
@@ -150,15 +145,13 @@ export default function AdminData({ products, setProducts, categories, setCatego
         setProducts(prev => prev.map(p => p.id === editingProduct ? {
           ...p,
           ...productForm,
-          default_image: finalDefaultImageUrl,
+          default_image: finalPathImage,
           unit_price: parseFloat(productForm.unit_price).toFixed(2),
           stock_quantity: qty,
           stock_status: status
         } : p));
-        console.log("🚀 PAYLOAD BEING UPDATED TO API:", JSON.stringify(productPayload, null, 2));
       }
     } else {
-
       // CREATE Product in database
       try {
         const res = await fetch('https://mm-api-virid.vercel.app/api/products', {
@@ -167,16 +160,13 @@ export default function AdminData({ products, setProducts, categories, setCatego
           body: JSON.stringify(productPayload)
         });
 
-        // ✅ FIXED: Read and log the exact error message from the backend server
         if (!res.ok) {
           const errorText = await res.text();
-          console.error("🔴 SERVER ERROR:", errorText); // 👈 Check your browser console for this output!
+          console.error("🔴 SERVER ERROR:", errorText);
           throw new Error(`API save failed: ${errorText}`);
         }
 
         const created = await res.json();
-
-        // ✅ FIXED: Push the clean database product object (with real dynamic IDs) back to your state
         setProducts(prev => [created, ...prev]);
         alert("Product has been added successfully");
       } catch (err) {
@@ -184,7 +174,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
         const newProduct = {
           id: Date.now(),
           ...productForm,
-          default_image: finalDefaultImageUrl,
+          default_image: finalPathImage,
           unit_price: parseFloat(productForm.unit_price).toFixed(2),
           stock_quantity: qty,
           stock_status: status
@@ -325,22 +315,6 @@ export default function AdminData({ products, setProducts, categories, setCatego
         <div className="mario-brand">
           <span>🛠️</span> ADMIN CONTROL PANEL
         </div>
-        <div className="mario-nav">
-          <button
-            className={`mario-btn ${activeTab === 'products' ? 'mario-btn-yellow' : ''}`}
-            onClick={() => setActiveTab('products')}
-            style={{ fontSize: '0.65rem' }}
-          >
-            Manage Products
-          </button>
-          <button
-            className={`mario-btn ${activeTab === 'categories' ? 'mario-btn-yellow' : ''}`}
-            onClick={() => setActiveTab('categories')}
-            style={{ fontSize: '0.65rem' }}
-          >
-            Manage Categories
-          </button>
-        </div>
       </header>
 
       {/* ==================== PRODUCTS MANAGEMENT VIEW ==================== */}
@@ -357,8 +331,11 @@ export default function AdminData({ products, setProducts, categories, setCatego
             <table className="db-details-table" style={{ margin: 0, border: 'none' }}>
               <thead>
                 <tr>
-                  <th>Image & Title</th>
+                  <th>Image</th>
+                  <th>Product Name</th>
                   <th>Category</th>
+                  <th>Size</th>
+                  <th>Colour</th>
                   <th>Price</th>
                   <th>Stock</th>
                   <th style={{ textAlign: 'center' }}>Actions</th>
@@ -367,7 +344,7 @@ export default function AdminData({ products, setProducts, categories, setCatego
               <tbody>
                 {products.length === 0 ? (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: '30px' }}>No products found in database.</td>
+                    <td colSpan="8" style={{ textAlign: 'center', padding: '30px' }}>No products found in database.</td>
                   </tr>
                 ) : (
                   products.map((product, i) => {
@@ -397,39 +374,52 @@ export default function AdminData({ products, setProducts, categories, setCatego
 
                     return (
                       <tr key={`product-${product.id}-${i}`}>
-                        <td style={{ padding: '12px', verticalAlign: 'middle' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {/* 1. SEPARATE COLUMN: Image */}
+                        <td style={{ padding: '12px', verticalAlign: 'middle', textAlign: 'center' }}>
                           {product.default_image ? (
                             <img
-                              //src={product.default_image}
-                            src={
-                              product.default_image.startsWith('http') || product.default_image.startsWith('/')
-                                ? product.default_image
-                                : `/product_image/${product.default_image}` // 👈 Re-adds the folder path for rendering
-                            }
-                              
+                              src={
+                                product.default_image.startsWith('http') || product.default_image.startsWith('/')
+                                  ? product.default_image
+                                  : `/product_image/${product.default_image}`
+                              }
                               alt={product.product_name || 'Product Image'}
                               style={{
-                                maxWidth: '100px',
-                                maxHeight: '100px',
+                                maxWidth: '60px',
+                                maxHeight: '60px',
                                 width: 'auto',
                                 height: 'auto',
                                 objectFit: 'contain',
                                 borderRadius: '4px',
-                                display: 'block'
+                                display: 'block',
+                                margin: '0 auto'
                               }}
                             />
                           ) : (
-                            <span style={{ color: '#888', fontStyle: 'italic' }}>No Image</span>
+                            <span style={{ color: '#888', fontStyle: 'italic', fontSize: '0.75rem' }}>No Image</span>
                           )}
+                        </td>
+
+                        {/* 2. SEPARATE COLUMN: Product Name */}
+                        <td style={{ verticalAlign: 'middle' }}>
                           <span style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>
                             {product.product_name || product.name || 'Unnamed Product'}
                           </span>
-                        </div>
                         </td>
                         <td>
                           <span className="product-badge" style={{ position: 'static' }}>
                             {resolvedCategoryName}
+                          </span>
+                        </td>
+                        <td style={{ verticalAlign: 'middle' }}>
+                          <span style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>
+                            {product.size || '-'}
+                          </span>
+                        </td>
+
+                        <td style={{ verticalAlign: 'middle' }}>
+                          <span style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>
+                            {product.colour || '-'}
                           </span>
                         </td>
                         <td>
