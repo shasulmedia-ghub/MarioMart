@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import './App.css';
 import Products from './component/Products.jsx';
 import ProductsData from './component/ProductsData.jsx';
@@ -14,9 +14,11 @@ import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import ProductModal from './components/ProductModal.jsx';
 import { CartProvider } from './context/CartContext.jsx';
+import AdminCat from './Admin/AdminCat.jsx';
 
 function App() {
   const [cartCount, setCartCount] = useState(0);
+  const location = useLocation();
 
   const fetchCartCount = async () => {
     try {
@@ -53,6 +55,10 @@ function App() {
     //fetchCartCount();
     console.log("App useeffect");
   }, []);
+
+  if (location.pathname === '/admin/category' || location.pathname === '/admin/categories') {
+    return <AdminCat />;
+  }
 
   return (
     <CartProvider>
