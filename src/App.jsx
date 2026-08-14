@@ -59,7 +59,7 @@ function App() {
   if (location.pathname === '/admin/category' || location.pathname === '/admin/categories') {
     return <AdminCat />;
   }
-
+  
   return (
     <CartProvider>
       <div className="app-container">

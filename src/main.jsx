@@ -22,6 +22,7 @@ import UserManagement from './Admin/UserManagement.jsx'
 import AdminCat from './Admin/AdminCat.jsx'
 import AdminProduct from './Admin/AdminProduct.jsx'
 import AdminAddProduct from './Admin/AdminAddProduct.jsx'
+import ImageUploadTest from './components/ImageUploadTest.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -40,7 +41,7 @@ createRoot(document.getElementById('root')).render(
 
           {/* Admin protected routes */}
           <Route path="/admin/dashboard"   element={<ProtectedRoute><SalesDashboard /></ProtectedRoute>} />
-          <Route path="/admin/category"    element={<ProtectedRoute><AdminCat /></ProtectedRoute>} />
+          <Route path="/admin/category"    element={<ProtectedRoute><ImageUploadTest /></ProtectedRoute>} />
           <Route path="/admin/product"     element={<ProtectedRoute><AdminProduct /></ProtectedRoute>} />
           <Route path="/admin/newProduct"  element={<ProtectedRoute><AdminAddProduct /></ProtectedRoute>} />
           <Route path="/admin/user"        element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
