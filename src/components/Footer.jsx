@@ -94,7 +94,10 @@ function Footer() {
               Customer Service
             </h5>
 
-            <ul className="list-unstyled text-secondary">
+            <ul className="list-unstyled text-secondary"
+              style={{
+                listStyleType: "none"
+              }}>
 
               <li className="mario-footer-credits"
                    style={{ 
@@ -220,7 +223,7 @@ function Footer() {
         <small className="mario-footer-credits fw-200">
           © {year} MarioMart. All Rights Reserved.
           <br />
-          Capstone Project by Shahul, Johnny and YingTong
+          Capstone Project by Johnny, Shahul and Ying Tong
         </small>
 
       </div>
