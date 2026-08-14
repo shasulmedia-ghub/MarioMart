@@ -116,6 +116,7 @@ export default function Navbar() {
               {openMenu === 'admin' && (
                 <DropdownMenu
                   items={[
+                    { label: 'Add Product', to: '/admin/newProduct' },
                     { label: 'Category', to: '/admin/category' },
                     { label: 'Product',  to: '/admin/product'  },
                     { label: 'User',     to: '/admin/user'     },

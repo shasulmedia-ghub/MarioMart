@@ -330,6 +330,7 @@ console.log(email);
     { uniqueId: 'demo-2', name: 'Star Power Sneakers',   colour: 'Yellow', size: '42', price: 89.90, quantity: 1, image_url: null },
     { uniqueId: 'demo-3', name: 'Koopa Shell Backpack',  colour: 'Green',  size: 'L',  price: 59.90, quantity: 1, image_url: null },
   ];
+console.log(items);
 
   const subtotal   = totalAmount > 0 ? totalAmount : items.reduce((s, i) => s + i.price * i.quantity, 0);
   const grandTotal = subtotal; // free shipping
