@@ -42,11 +42,17 @@ export default function AdminAddProduct() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Image Upload State
+  // Image Upload State (Default Image)
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState('');
+
+  // Image Upload State (Variant Image)
+  const variantFileInputRef = useRef(null);
+  const [selectedVariantFile, setSelectedVariantFile] = useState(null);
+  const [uploadingVariantImage, setUploadingVariantImage] = useState(false);
+  const [variantUploadError, setVariantUploadError] = useState('');
 
   const getHeaders = () => {
     const currentToken = token || localStorage.getItem('mm_token');
@@ -146,6 +152,46 @@ export default function AdminAddProduct() {
     }
   };
 
+  const handlevariantImageUpload = async (fileToUpload) => {
+    const file = fileToUpload || selectedVariantFile;
+    if (!file) {
+      variantFileInputRef.current?.click();
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      setUploadingVariantImage(true);
+      setVariantUploadError('');
+
+      let res = await fetch('/api/upload.js', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.status === 404) {
+        res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+      }
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setVariantHeader((prev) => ({ ...prev, image_url: data.url }));
+        setVariantUploadError('');
+      } else {
+        setVariantUploadError(data.error || 'Upload failed');
+      }
+    } catch (err) {
+      setVariantUploadError(err.message || 'Upload failed');
+    } finally {
+      setUploadingVariantImage(false);
+    }
+  };
+
   const resetForm = () => {
     setProductForm({
       category_id: '',
@@ -170,6 +216,11 @@ export default function AdminAddProduct() {
     setUploadError('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+    setSelectedVariantFile(null);
+    setVariantUploadError('');
+    if (variantFileInputRef.current) {
+      variantFileInputRef.current.value = '';
     }
   };
 
@@ -584,14 +635,84 @@ export default function AdminAddProduct() {
                   <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
                     Variant Image URL *
                   </label>
-                  <input
-                    className="search-input"
-                    type="text"
-                    value={variantHeader.image_url}
-                    onChange={(e) => setVariantHeader({ ...variantHeader, image_url: e.target.value })}
-                    placeholder="/product_image/mario-red.jpg or https://..."
-                    required
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      className="search-input"
+                      type="text"
+                      value={variantHeader.image_url}
+                      onChange={(e) => setVariantHeader({ ...variantHeader, image_url: e.target.value })}
+                      placeholder="/product_image/mario-red.jpg or https://..."
+                      required
+                      style={{ flex: 1 }}
+                    />
+                    <input
+                      type="file"
+                      ref={variantFileInputRef}
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setSelectedVariantFile(file);
+                          handlevariantImageUpload(file);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      title="Upload Variant Image"
+                      className="mario-btn mario-btn-blue"
+                      onClick={() => {
+                        if (selectedVariantFile) {
+                          handlevariantImageUpload(selectedVariantFile);
+                        } else {
+                          variantFileInputRef.current?.click();
+                        }
+                      }}
+                      disabled={uploadingVariantImage}
+                      style={{
+                        padding: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Upload size={16} />
+                    </button>
+                  </div>
+
+                  {selectedVariantFile && (
+                    <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '4px' }}>
+                      Selected: {selectedVariantFile.name} {uploadingVariantImage && '(Uploading...)'}
+                    </div>
+                  )}
+
+                  {variantUploadError && (
+                    <div style={{ color: 'var(--mario-red-dark)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 'bold' }}>
+                      ❌ {variantUploadError}
+                    </div>
+                  )}
+
+                  {variantHeader.image_url && (
+                    <div style={{ marginTop: '8px' }}>
+                      <img
+                        src={variantHeader.image_url}
+                        alt="Variant thumbnail preview"
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          border: '2px solid var(--dark-text)',
+                          background: '#fff',
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* New Arrival Checkbox */}
