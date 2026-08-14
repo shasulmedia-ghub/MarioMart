@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Plus, Edit, Trash2, ChevronDown, ChevronRight, X } from 'lucide-react';
+import { Plus, Edit, Trash2, ChevronDown, ChevronRight, X, Upload } from 'lucide-react';
 
 const API_BASE = 'https://mm-api-virid.vercel.app';
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Free Size'];
@@ -66,6 +66,12 @@ export default function AdminProduct() {
   );
   const [addVariantError, setAddVariantError] = useState('');
   const [addVariantSubmitting, setAddVariantSubmitting] = useState(false);
+
+  // Add Variant Modal – image upload state
+  const [uploadingAddVariantImage, setUploadingAddVariantImage] = useState(false);
+  const [addVariantUploadError, setAddVariantUploadError] = useState('');
+  const [selectedAddVariantFile, setSelectedAddVariantFile] = useState(null);
+  const addVariantFileInputRef = useRef(null);
 
   const getHeaders = () => {
     const currentToken = token || localStorage.getItem('mm_token');
@@ -424,6 +430,31 @@ export default function AdminProduct() {
       setAddVariantError(err.message);
     } finally {
       setAddVariantSubmitting(false);
+    }
+  };
+
+  const handleAddVariantImageUpload = async (file) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      setUploadingAddVariantImage(true);
+      setAddVariantUploadError('');
+      let res = await fetch('/api/upload.js', { method: 'POST', body: formData });
+      if (res.status === 404) {
+        res = await fetch('/api/upload', { method: 'POST', body: formData });
+      }
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setAddVariantHeader((prev) => ({ ...prev, image_url: data.url }));
+        setAddVariantUploadError('');
+      } else {
+        setAddVariantUploadError(data.error || 'Upload failed');
+      }
+    } catch (err) {
+      setAddVariantUploadError(err.message || 'Upload failed');
+    } finally {
+      setUploadingAddVariantImage(false);
     }
   };
 
@@ -1275,14 +1306,82 @@ export default function AdminProduct() {
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
                   Image URL *
                 </label>
-                <input
-                  className="search-input"
-                  type="text"
-                  value={addVariantHeader.image_url}
-                  onChange={(e) => setAddVariantHeader({ ...addVariantHeader, image_url: e.target.value })}
-                  placeholder="/product_image/variant.jpg or https://..."
-                  required
-                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    className="search-input"
+                    type="text"
+                    value={addVariantHeader.image_url}
+                    onChange={(e) => setAddVariantHeader({ ...addVariantHeader, image_url: e.target.value })}
+                    placeholder="/product_image/variant.jpg or https://..."
+                    required
+                    style={{ flex: 1 }}
+                  />
+                  <input
+                    type="file"
+                    ref={addVariantFileInputRef}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSelectedAddVariantFile(file);
+                        handleAddVariantImageUpload(file);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    title="Upload Variant Image"
+                    className="mario-btn mario-btn-blue"
+                    onClick={() => {
+                      if (selectedAddVariantFile) {
+                        handleAddVariantImageUpload(selectedAddVariantFile);
+                      } else {
+                        addVariantFileInputRef.current?.click();
+                      }
+                    }}
+                    disabled={uploadingAddVariantImage}
+                    style={{
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Upload size={16} />
+                  </button>
+                </div>
+
+                {selectedAddVariantFile && (
+                  <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '4px' }}>
+                    Selected: {selectedAddVariantFile.name} {uploadingAddVariantImage && '(Uploading...)'}
+                  </div>
+                )}
+
+                {addVariantUploadError && (
+                  <div style={{ color: 'var(--mario-red-dark)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 'bold' }}>
+                    ❌ {addVariantUploadError}
+                  </div>
+                )}
+
+                {addVariantHeader.image_url && (
+                  <div style={{ marginTop: '8px' }}>
+                    <img
+                      src={addVariantHeader.image_url}
+                      alt="Variant thumbnail preview"
+                      style={{
+                        width: '44px',
+                        height: '44px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        border: '2px solid var(--dark-text)',
+                        background: '#fff',
+                      }}
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* New Arrival Checkbox */}
@@ -1298,7 +1397,7 @@ export default function AdminProduct() {
                   htmlFor="modal_new_arrival"
                   style={{ fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem', color: '#64748B' }}
                 >
-                  New Arrival (Default: True)
+                  New Arrival
                 </label>
               </div>
 
