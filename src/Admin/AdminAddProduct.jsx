@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Plus, Check, AlertCircle } from 'lucide-react';
+import { Plus, Check, AlertCircle, Upload } from 'lucide-react';
 
 const API_BASE = 'https://mm-api-virid.vercel.app';
 const FIXED_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Free Size'];
@@ -41,6 +41,12 @@ export default function AdminAddProduct() {
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Image Upload State
+  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   const getHeaders = () => {
     const currentToken = token || localStorage.getItem('mm_token');
@@ -100,6 +106,46 @@ export default function AdminAddProduct() {
     );
   };
 
+  const handledefaultImageUpload = async (fileToUpload) => {
+    const file = fileToUpload || selectedFile;
+    if (!file) {
+      fileInputRef.current?.click();
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      setUploadingImage(true);
+      setUploadError('');
+
+      let res = await fetch('/api/upload.js', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.status === 404) {
+        res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+      }
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setProductForm((prev) => ({ ...prev, default_image: data.url }));
+        setUploadError('');
+      } else {
+        setUploadError(data.error || 'Upload failed');
+      }
+    } catch (err) {
+      setUploadError(err.message || 'Upload failed');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const resetForm = () => {
     setProductForm({
       category_id: '',
@@ -120,7 +166,13 @@ export default function AdminAddProduct() {
         price: '',
       }))
     );
+    setSelectedFile(null);
+    setUploadError('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
+
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -384,14 +436,84 @@ export default function AdminAddProduct() {
                   <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
                     Default Image URL *
                   </label>
-                  <input
-                    className="search-input"
-                    type="text"
-                    value={productForm.default_image}
-                    onChange={(e) => setProductForm({ ...productForm, default_image: e.target.value })}
-                    placeholder="/image/product/mario-shirt.jpg or https://..."
-                    required
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      className="search-input"
+                      type="text"
+                      value={productForm.default_image}
+                      onChange={(e) => setProductForm({ ...productForm, default_image: e.target.value })}
+                      placeholder="/image/product/mario-shirt.jpg or https://..."
+                      required
+                      style={{ flex: 1 }}
+                    />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setSelectedFile(file);
+                          handledefaultImageUpload(file);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      title="Upload Image"
+                      className="mario-btn mario-btn-blue"
+                      onClick={() => {
+                        if (selectedFile) {
+                          handledefaultImageUpload(selectedFile);
+                        } else {
+                          fileInputRef.current?.click();
+                        }
+                      }}
+                      disabled={uploadingImage}
+                      style={{
+                        padding: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Upload size={16} />
+                    </button>
+                  </div>
+
+                  {selectedFile && (
+                    <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '4px' }}>
+                      Selected: {selectedFile.name} {uploadingImage && '(Uploading...)'}
+                    </div>
+                  )}
+
+                  {uploadError && (
+                    <div style={{ color: 'var(--mario-red-dark)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 'bold' }}>
+                      ❌ {uploadError}
+                    </div>
+                  )}
+
+                  {productForm.default_image && (
+                    <div style={{ marginTop: '8px' }}>
+                      <img
+                        src={productForm.default_image}
+                        alt="Thumbnail preview"
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          border: '2px solid var(--dark-text)',
+                          background: '#fff',
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
