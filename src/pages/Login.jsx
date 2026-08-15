@@ -52,13 +52,13 @@ export default function Login() {
 
       const user = {
         id:    decoded.id    ?? decoded.userId ?? decoded.sub ?? data.user?.id    ?? null,
-        name:  decoded.name  ?? data.user?.name  ?? '',
-        email: decoded.email ?? data.user?.email ?? form.email,
+        name:  data.user.firstName + ' ' + data.user.lastName,
+        email: data.user.email,
         role:  decoded.role  ?? decoded.userRole ?? data.user?.role ?? 'customer',
       };
 
       login(token, user);
-      navigate(from, { replace: true });
+      navigate(user.role === 'admin' ? '/admin/dashboard' : '/', { replace: true });
     } catch (err) {
       setError('Network error. Please try again.');
     } finally {

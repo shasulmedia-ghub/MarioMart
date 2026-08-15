@@ -133,9 +133,19 @@ const OrderCard = ({ order, handleUpdateStatus }) => {
                 <div style={{ flex: 1, minWidth: '120px' }}>
                   <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{item.product_name}</div>
                   <div style={{ display: 'flex', gap: '6px', marginTop: '3px', flexWrap: 'wrap' }}>
-                    <span style={{ background: '#CBD5E1', padding: '2px 7px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600 }}>
+{/*                     <span style={{ background: '#CBD5E1', padding: '2px 7px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600 }}>
                       Color: {item.colour}
-                    </span>
+                    </span> */}
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: '14px',
+                        height: '14px',
+                        borderRadius: '50%',
+                        background: item.colour || '#ccc',
+                        border: '1px solid #64748B',
+                      }}
+                    />
                     <span style={{ background: '#CBD5E1', padding: '2px 7px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600 }}>
                       Size: {item.size}
                     </span>
