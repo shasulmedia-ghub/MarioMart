@@ -502,9 +502,19 @@ const response = await fetch(`https://mm-api-virid.vercel.app/api/orders`, {
               <div style={{ flex: 1, minWidth: '140px' }}>
                 <div style={{ fontWeight: 700, fontSize: '0.98rem' }}>{item.name}</div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
-                  <span style={{ background: '#CBD5E1', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>
+{/*                   <span style={{ background: '#CBD5E1', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>
                     Color: {item.colour}
-                  </span>
+                  </span> */}
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: '14px',
+                      height: '14px',
+                      borderRadius: '50%',
+                      background: item.colour || '#ccc',
+                      border: '1px solid #64748B',
+                    }}
+                  />
                   <span style={{ background: '#CBD5E1', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>
                     Size: {item.size}
                   </span>
