@@ -204,7 +204,7 @@ console.log(selectedVariant);
                 <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px', fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--dark-text)' }}>
                   <span>${Number(price).toFixed(2)}</span>
                   <span className={`stock-badge ${stock.className}`}>
-                    {stock.label} ({stockQuantity} available)
+                    {stock.label} {/*({stockQuantity} available)*/}
                   </span>
                 </div>
               </div>
