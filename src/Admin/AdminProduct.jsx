@@ -1092,7 +1092,7 @@ export default function AdminProduct() {
 
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
-                  Default Image URL
+                  Default Image (Max File Size: 4MB)
                 </label>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <input
@@ -1318,7 +1318,7 @@ export default function AdminProduct() {
               {/* Image URL */}
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
-                  Image URL
+                  Image URL (Max File Size: 4MB)
                 </label>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <input
@@ -1514,7 +1514,7 @@ export default function AdminProduct() {
               {/* Image URL */}
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
-                  Image URL *
+                  Image URL (Max File Size: 4MB) *
                 </label>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <input

@@ -347,9 +347,11 @@ function Cart() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 3px 0 var(--dark-text)'
+                    boxShadow: '0 3px 0 var(--dark-text)',
+                    marginRight: '12px',
+                    flexShrink: 0,
                   }}>
-                    <img style={{ width: '100px', height: '100px' }} src={item.image_url} alt={item.name} />
+                    <img style={{ width: '90px', height: '90px' }} src={item.image_url} alt={item.name} />
                   </div>
 
                   {/* Product Details info */}
