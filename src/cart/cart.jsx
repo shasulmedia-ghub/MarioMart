@@ -436,9 +436,9 @@ function Cart() {
                         +
                       </button>
                     </div>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--mario-red)', marginTop: '4px', textAlign: 'center' }}>
+{/*                     <span style={{ fontSize: '0.65rem', color: 'var(--mario-red)', marginTop: '4px', textAlign: 'center' }}>
                       Available Qty: {item.availableQty}
-                    </span>
+                    </span> */}
                   </div>
 
                   {/* Item Subtotal */}
