@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 /* ============================================================
    Checkout Page
@@ -291,6 +292,7 @@ const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { fetchCartCount } = useOutletContext() || {};
+  const { refreshCartCount } = useCart();
   
   const checkoutItems = location.state?.items || [];
   const totalAmount = location.state?.subtotal || 0;
@@ -420,11 +422,11 @@ const response = await fetch(`https://mm-api-virid.vercel.app/api/orders`, {
   });
 
   const data = await response.json();
-  console.log(data);  
+  refreshCartCount();
+
     // Simulate payment processing delay then remove purchased items from cart
     await new Promise((resolve) => setTimeout(resolve, 1800));
     //await deleteCartItems(items);
-    if (fetchCartCount) fetchCartCount();
     setIsProcessing(false);
     setPaymentSuccess(true);
   };

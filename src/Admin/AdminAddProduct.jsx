@@ -485,7 +485,7 @@ export default function AdminAddProduct() {
                 {/* Default Image URL */}
                 <div>
                   <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
-                    Default Image URL *
+                    Default Image (Max File Size: 4MB) *
                   </label>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <input
@@ -633,7 +633,7 @@ export default function AdminAddProduct() {
                 {/* Variant Image URL */}
                 <div>
                   <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
-                    Variant Image URL *
+                    Variant Image (Max File Size: 4MB) *
                   </label>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <input
