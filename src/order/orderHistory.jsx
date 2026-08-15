@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-  import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 /* ============================================================
    Order History Page
@@ -141,9 +142,19 @@ const OrderCard = ({ order }) => {
                 <div style={{ flex: 1, minWidth: '120px' }}>
                   <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{item.product_name}</div>
                   <div style={{ display: 'flex', gap: '6px', marginTop: '3px', flexWrap: 'wrap' }}>
-                    <span style={{ background: '#CBD5E1', padding: '2px 7px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600 }}>
+{/*                     <span style={{ background: '#CBD5E1', padding: '2px 7px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600 }}>
                       Color: {item.colour}
-                    </span>
+                    </span> */}
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: '14px',
+                        height: '14px',
+                        borderRadius: '50%',
+                        background: item.colour || '#ccc',
+                        border: '1px solid #64748B',
+                      }}
+                    />
                     <span style={{ background: '#CBD5E1', padding: '2px 7px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600 }}>
                       Size: {item.size}
                     </span>
@@ -224,6 +235,7 @@ const OrderSection = ({ title, emoji, orders, emptyMessage }) => (
 // ---- Main Component ----
 const OrderHistory = ({ onSwitchView }) => {
   const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user, role, isAuthenticated, logout } = useAuth();
@@ -262,7 +274,7 @@ const OrderHistory = ({ onSwitchView }) => {
       {/* Back to Shop */}
       <button
         className="mario-btn mario-btn-yellow"
-        onClick={() => onSwitchView('shop')}
+        onClick={() => navigate('/')}
         style={{ marginBottom: '24px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}
       >
         ← Back to Shop

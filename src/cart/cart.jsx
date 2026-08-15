@@ -340,7 +340,7 @@ function Cart() {
                   <div style={{
                     fontSize: '2.5rem',
                     background: 'var(--sky-bg)',
-                    border: '2px solid var(--dark-text)',
+                    border: '1px solid var(--dark-text)',
                     borderRadius: '12px',
                     width: '64px',
                     height: '64px',
@@ -356,9 +356,19 @@ function Cart() {
                   <div style={{ flex: '1', minWidth: '150px' }}>
                     <h4 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 'bold' }}>{item.name}</h4>
                     <div style={{ display: 'flex', gap: '8px', fontSize: '0.8rem', color: '#64748B', marginTop: '4px', flexWrap: 'wrap' }}>
-                      <span style={{ background: '#CBD5E1', padding: '2px 8px', borderRadius: '6px', color: 'var(--dark-text)', fontWeight: '600' }}>
+{/*                       <span style={{ background: '#CBD5E1', padding: '2px 8px', borderRadius: '6px', color: 'var(--dark-text)', fontWeight: '600' }}>
                         Color: {item.colour}
-                      </span>
+                      </span> */}
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          width: '14px',
+                          height: '14px',
+                          borderRadius: '50%',
+                          background: item.colour || '#ccc',
+                          border: '1px solid #64748B',
+                        }}
+                      />
                       <span style={{ background: '#CBD5E1', padding: '2px 8px', borderRadius: '6px', color: 'var(--dark-text)', fontWeight: '600' }}>
                         Size: {item.size}
                       </span>
