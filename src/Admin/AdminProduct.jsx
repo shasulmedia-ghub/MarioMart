@@ -73,6 +73,18 @@ export default function AdminProduct() {
   const [selectedAddVariantFile, setSelectedAddVariantFile] = useState(null);
   const addVariantFileInputRef = useRef(null);
 
+  // Default Image Upload State
+  const [selectedDefaultImageFile, setSelectedDefaultImageFile] = useState(null);
+  const [uploadingDefaultImage, setUploadingDefaultImage] = useState(false);
+  const [defaultImageUploadError, setDefaultImageUploadError] = useState('');
+  const defaultImageFileInputRef = useRef(null);
+
+  // Variant Image Upload State
+  const [selectedVariantFile, setSelectedVariantFile] = useState(null);
+  const [uploadingVariantImage, setUploadingVariantImage] = useState(false);
+  const [variantUploadError, setVariantUploadError] = useState('');
+  const variantFileInputRef = useRef(null);
+
   const getHeaders = () => {
     const currentToken = token || localStorage.getItem('mm_token');
     const headers = { 'Content-Type': 'application/json' };
@@ -142,6 +154,8 @@ export default function AdminProduct() {
       status: Boolean(product.status),
     });
     setProductFormError('');
+    setSelectedDefaultImageFile(null);
+    setDefaultImageUploadError('');
     setShowProductModal(true);
   };
 
@@ -149,6 +163,8 @@ export default function AdminProduct() {
     setShowProductModal(false);
     setEditingProduct(null);
     setProductFormError('');
+    setSelectedDefaultImageFile(null);
+    setDefaultImageUploadError('');
   };
 
   const handleProductSubmit = async (e) => {
@@ -232,6 +248,8 @@ export default function AdminProduct() {
     });
 
     setVariantFormError('');
+    setSelectedVariantFile(null);
+    setVariantUploadError('');
     setShowVariantModal(true);
   };
 
@@ -239,6 +257,8 @@ export default function AdminProduct() {
     setShowVariantModal(false);
     setEditingVariant(null);
     setVariantFormError('');
+    setSelectedVariantFile(null);
+    setVariantUploadError('');
   };
 
   const isValidHex = (color) => /^#([0-9A-F]{3}){1,2}$/i.test(color);
@@ -455,6 +475,56 @@ export default function AdminProduct() {
       setAddVariantUploadError(err.message || 'Upload failed');
     } finally {
       setUploadingAddVariantImage(false);
+    }
+  };
+
+  const handledefaultImageUpload = async (file) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      setUploadingDefaultImage(true);
+      setDefaultImageUploadError('');
+      let res = await fetch('/api/upload.js', { method: 'POST', body: formData });
+      if (res.status === 404) {
+        res = await fetch('/api/upload', { method: 'POST', body: formData });
+      }
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setProductForm((prev) => ({ ...prev, default_image: data.url }));
+        setDefaultImageUploadError('');
+      } else {
+        setDefaultImageUploadError(data.error || 'Upload failed');
+      }
+    } catch (err) {
+      setDefaultImageUploadError(err.message || 'Upload failed');
+    } finally {
+      setUploadingDefaultImage(false);
+    }
+  };
+
+  const handleVariantImageUpload = async (file) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      setUploadingVariantImage(true);
+      setVariantUploadError('');
+      let res = await fetch('/api/upload.js', { method: 'POST', body: formData });
+      if (res.status === 404) {
+        res = await fetch('/api/upload', { method: 'POST', body: formData });
+      }
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setVariantForm((prev) => ({ ...prev, image_url: data.url }));
+        setVariantUploadError('');
+      } else {
+        setVariantUploadError(data.error || 'Upload failed');
+      }
+    } catch (err) {
+      setVariantUploadError(err.message || 'Upload failed');
+    } finally {
+      setUploadingVariantImage(false);
     }
   };
 
@@ -1024,13 +1094,83 @@ export default function AdminProduct() {
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
                   Default Image URL
                 </label>
-                <input
-                  className="search-input"
-                  type="text"
-                  value={productForm.default_image}
-                  onChange={(e) => setProductForm({ ...productForm, default_image: e.target.value })}
-                  placeholder="/image/product/item.jpg or https://..."
-                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    className="search-input"
+                    type="text"
+                    value={productForm.default_image}
+                    onChange={(e) => setProductForm({ ...productForm, default_image: e.target.value })}
+                    placeholder="/image/product/item.jpg or https://..."
+                    style={{ flex: 1 }}
+                  />
+                  <input
+                    type="file"
+                    ref={defaultImageFileInputRef}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSelectedDefaultImageFile(file);
+                        handledefaultImageUpload(file);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    title="Upload Default Image"
+                    className="mario-btn mario-btn-blue"
+                    onClick={() => {
+                      if (selectedDefaultImageFile) {
+                        handledefaultImageUpload(selectedDefaultImageFile);
+                      } else {
+                        defaultImageFileInputRef.current?.click();
+                      }
+                    }}
+                    disabled={uploadingDefaultImage}
+                    style={{
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Upload size={16} />
+                  </button>
+                </div>
+
+                {selectedDefaultImageFile && (
+                  <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '4px' }}>
+                    Selected: {selectedDefaultImageFile.name} {uploadingDefaultImage && '(Uploading...)'}
+                  </div>
+                )}
+
+                {defaultImageUploadError && (
+                  <div style={{ color: 'var(--mario-red-dark)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 'bold' }}>
+                    ❌ {defaultImageUploadError}
+                  </div>
+                )}
+
+                {productForm.default_image && (
+                  <div style={{ marginTop: '8px' }}>
+                    <img
+                      src={productForm.default_image}
+                      alt="Product default preview"
+                      style={{
+                        width: '44px',
+                        height: '44px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        border: '2px solid var(--dark-text)',
+                        background: '#fff',
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
@@ -1180,13 +1320,83 @@ export default function AdminProduct() {
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontFamily: 'var(--font-main)', fontSize: '0.9rem' }}>
                   Image URL
                 </label>
-                <input
-                  className="search-input"
-                  type="text"
-                  value={variantForm.image_url}
-                  onChange={(e) => setVariantForm({ ...variantForm, image_url: e.target.value })}
-                  placeholder="/product_image/variant.jpg or https://..."
-                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    className="search-input"
+                    type="text"
+                    value={variantForm.image_url}
+                    onChange={(e) => setVariantForm({ ...variantForm, image_url: e.target.value })}
+                    placeholder="/product_image/variant.jpg or https://..."
+                    style={{ flex: 1 }}
+                  />
+                  <input
+                    type="file"
+                    ref={variantFileInputRef}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSelectedVariantFile(file);
+                        handleVariantImageUpload(file);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    title="Upload Variant Image"
+                    className="mario-btn mario-btn-blue"
+                    onClick={() => {
+                      if (selectedVariantFile) {
+                        handleVariantImageUpload(selectedVariantFile);
+                      } else {
+                        variantFileInputRef.current?.click();
+                      }
+                    }}
+                    disabled={uploadingVariantImage}
+                    style={{
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Upload size={16} />
+                  </button>
+                </div>
+
+                {selectedVariantFile && (
+                  <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '4px' }}>
+                    Selected: {selectedVariantFile.name} {uploadingVariantImage && '(Uploading...)'}
+                  </div>
+                )}
+
+                {variantUploadError && (
+                  <div style={{ color: 'var(--mario-red-dark)', fontSize: '0.85rem', marginTop: '4px', fontWeight: 'bold' }}>
+                    ❌ {variantUploadError}
+                  </div>
+                )}
+
+                {variantForm.image_url && (
+                  <div style={{ marginTop: '8px' }}>
+                    <img
+                      src={variantForm.image_url}
+                      alt="Variant preview"
+                      style={{
+                        width: '44px',
+                        height: '44px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        border: '2px solid var(--dark-text)',
+                        background: '#fff',
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Checkboxes */}
