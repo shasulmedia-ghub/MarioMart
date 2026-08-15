@@ -319,7 +319,7 @@ const OrderHistory = ({ onSwitchView }) => {
           </p>
           <button
             className="mario-btn mario-btn-green"
-            onClick={() => onSwitchView('shop')}
+        onClick={() => navigate('/')}
             style={{ marginTop: '16px', fontSize: '0.88rem' }}
           >
             Start Shopping 🏁

@@ -302,7 +302,7 @@ function Cart() {
             {cartItems.map((item) => {
               const isSelected = selectedItemIds.has(item.uniqueId);
               const isUpdating = actionLoading === item.uniqueId;
-              console.warn(item)
+              //console.warn(item)
               return (
                 <div 
                   key={item.uniqueId} 

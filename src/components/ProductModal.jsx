@@ -22,7 +22,7 @@ function ProductModal({ product, onClose }) {
     const fetchDetails = async () => {
       try {
         setLoading(true);
-        console.log(product);
+        //console.log(product);
         const res = await fetch(`https://mm-api-virid.vercel.app/api/products/${product.id}/details`);
         if (!res.ok) throw new Error('Failed to fetch product details');
         const data = await res.json();
@@ -89,7 +89,7 @@ function ProductModal({ product, onClose }) {
     }
     
     if (!selectedVariant && variants.length > 0) return;
-console.log(selectedVariant);
+//console.log(selectedVariant);
 
     try {
       setAddingToCart(true);

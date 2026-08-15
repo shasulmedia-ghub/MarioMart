@@ -324,7 +324,7 @@ const Checkout = () => {
 
 // const email variable
 const email = user.email;
-console.log(email);
+//console.log(email);
 
   // Demo fallback data when no props are passed from Cart
   const items = checkoutItems.length > 0 ? checkoutItems : [
@@ -332,7 +332,7 @@ console.log(email);
     { uniqueId: 'demo-2', name: 'Star Power Sneakers',   colour: 'Yellow', size: '42', price: 89.90, quantity: 1, image_url: null },
     { uniqueId: 'demo-3', name: 'Koopa Shell Backpack',  colour: 'Green',  size: 'L',  price: 59.90, quantity: 1, image_url: null },
   ];
-console.log(items);
+//console.log(items);
 
   const subtotal   = totalAmount > 0 ? totalAmount : items.reduce((s, i) => s + i.price * i.quantity, 0);
   const grandTotal = subtotal; // free shipping
@@ -376,7 +376,7 @@ console.log(items);
           // try DELETE by item id if body-based DELETE is not supported
             const itemId = item.id || item._id;
             if (itemId) {
-                console.log(itemId)
+                //console.log(itemId)
               await fetch(`https://mm-api-virid.vercel.app/api/cart/${itemId}`, {
                 method: 'DELETE',
               });
@@ -408,7 +408,7 @@ console.log(items);
     }
     setIsProcessing(true);
 // send userid, shippingaddress and array of carditemids to create orders api end point https://mm-api-virid.vercel.app/api/orders
-console.log(items);  
+//console.log(items);  
 const response = await fetch(`https://mm-api-virid.vercel.app/api/orders`, {
     method: 'POST',
     headers: {

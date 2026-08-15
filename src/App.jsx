@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import './App.css';
-import Products from './component/Products.jsx';
-import ProductsData from './component/ProductsData.jsx';
-import UserProducts from './component/UserProducts.jsx';
-import ProductDetails from './component/ProductDetails';
+//import Products from './component/Products.jsx';
+//import ProductsData from './component/ProductsData.jsx';
+//import UserProducts from './component/UserProducts.jsx';
+//import ProductDetails from './component/ProductDetails';
 
 //import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Cart from './cart/cart.jsx';
-import Checkout from './checkout/checkout.jsx';
-import OrderHistory from './order/orderHistory.jsx';
+//import Cart from './cart/cart.jsx';
+//import Checkout from './checkout/checkout.jsx';
+//import OrderHistory from './order/orderHistory.jsx';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
-import ProductModal from './components/ProductModal.jsx';
+//import ProductModal from './components/ProductModal.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import AdminCat from './Admin/AdminCat.jsx';
 
@@ -47,13 +47,13 @@ function App() {
 
       {/* <Products/> */}
       {/* <ProductsData/> */}
-      <UserProducts/>
+      {/*<UserProducts/>*/}
 
       
 
   useEffect(() => {
     //fetchCartCount();
-    console.log("App useeffect");
+    //console.log("App useeffect");
   }, []);
 
   if (location.pathname === '/admin/category' || location.pathname === '/admin/categories') {
